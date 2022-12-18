@@ -1,209 +1,69 @@
 const mongoClient = require("mongodb").MongoClient;
 const ObjectID = require("mongodb").ObjectId;
-module.exports.GetCronLogs = async (pgNo, type, cronId) => {
-    let query = {}
-    if (type) {
-        switch (type) {
-            case 'Manual':
-                query['type'] = 'Manual'
-                break
-            case 'Regular':
-                query['type'] = { $ne: 'Manual' }
-                break
-            case 'All':
-                break
-            default:
-                break
-        }
-    }
-    if (cronId != '') {
-        query['cronId'] = cronId
-    }
-    let mongoResult = null, pageSize = 0, pageNumber = 0, totalDocs = 0, totalPages = 0;
+
+
+module.exports.GetAllOfficeLocations = async () => {
+    let officeLocationDetails=null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        var dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-
-        pageSize = parseInt(process.env.CRON_PAGESIZE)
-        pageNumber = pgNo || 0
-        totalDocs = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).countDocuments(query)
-        totalPages = Math.ceil(totalDocs / pageSize)
-        mongoResult = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).find(query).sort({ $natural: -1 }).skip(pageNumber * pageSize).limit(pageSize).toArray();
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        officeLocationDetails = await dbo.collection(process.env.LOCATIONS_COLLECTIONS_NAME).find().toArray();
         dbConnection.close();
     }
     catch (exception) {
         console.log(exception);
     }
-    return { mongoResult, pageNumber, pageSize, totalDocs, totalPages };
+    return officeLocationDetails.map(function ($loc) { return $loc["OfficeLocation"]; });
 }
 
-module.exports.GetItemList = async (mpId) => {
-    let mongoResult = null;
+module.exports.GetParkingLocationsByOffice = async (officeName) => {
+    let parkingLocationsDetails = null;
     try {
+        const query = { "OfficeLocation": officeName };
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-
-        const query = { "mpid": mpId };
-        mongoResult = await dbo.collection(process.env.ITEMS_COLLECTION_NAME).find(query).toArray();
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        parkingLocationsDetails = await dbo.collection(process.env.LOCATIONS_COLLECTIONS_NAME).findOne(query);
         dbConnection.close();
     }
     catch (exception) {
         console.log(exception);
     }
-    return mongoResult;
+    return parkingLocationsDetails.ParkingLocations;
 }
 
-module.exports.UpdateCronLogPostPriceUpdate = async (req) => {
-    let mongoResult = null;
+module.exports.GetParkingDetails=async(locationId)=>
+{
+    let parkingDetails = null;
     try {
+        const query = { "LocationId": locationId };
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).findOneAndUpdate(
-            { _id: req._id },
-            {
-                $set: {
-                    logs: req.logs
-                }
-            }
-        );
-        dbConnection.close();
-
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-}
-
-module.exports.GetLogsById = async (id) => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        const query = { "_id": ObjectID(id) };
-        mongoResult = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).find(query).toArray();
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        parkingDetails = await dbo.collection(process.env.PARKING_INFO).findOne(query);
         dbConnection.close();
     }
     catch (exception) {
         console.log(exception);
     }
-    return mongoResult;
+    return parkingDetails;
 }
 
-module.exports.GetLatestCronStatus = async () => {
+module.exports.UpdateParkingDetails=async(payload)=>{
     let mongoResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        const query = { "status": "In-Progress" };
-        mongoResult = await dbo.collection(process.env.CRON_STATUS_COLLECTION_NAME).find(query).sort({ _id: -1 }).toArray();
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-}
-
-module.exports.PushManualCronLogAsync = async (payload) => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        var dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).insertOne(payload);
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-
-}
-
-module.exports.GetCronSettingsList = async () => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.CRON_SETTINGS_COLLECTION_NAME).find().toArray();
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-}
-
-module.exports.UpdateCronSettingsList = async (payload) => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        for (const element of payload) {
-            mongoResult = await dbo.collection(process.env.CRON_SETTINGS_COLLECTION_NAME).findOneAndUpdate(
-                { CronId: element.CronId },
-                {
-                    $set:
-                    {
-                        "CronName": element.CronName,
-                        "CronTime": element.CronTime,
-                        "CronTimeUnit": element.CronTimeUnit,
-                        "SecretKey": element.SecretKey,
-                        //"CreatedTime": element.CreatedTime,
-                        //"UpdatedTime": element.UpdatedTime,
-                        //"CronStatus": element.CronStatus
-                    }
-                }
-            );
-        }
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-}
-
-module.exports.InsertCronSettings = async (payload) => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        var dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.CRON_SETTINGS_COLLECTION_NAME).insertOne(payload);
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-
-}
-
-module.exports.ToggleCronStatus = async (cronId, cronStatus) => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.CRON_SETTINGS_COLLECTION_NAME).findOneAndUpdate(
-            { CronId: cronId },
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        mongoResult = await dbo.collection(process.env.PARKING_INFO).findOneAndUpdate(
+            { LocationId: payload.locationId },
             {
                 $set:
                 {
-                    "CronStatus": cronStatus
+                    "NoOfTwoWheelerParking": parseInt(payload.twoWheelerCount),
+                    "NoOfFourWheelerParking": parseInt(payload.fourWheelerCount),
+                    "UpdatedAt":new Date(),
+                    "UpdatedBy":payload.user
                 }
             }
         );
-        if (cronStatus == true) {
-            mongoResult = await dbo.collection(process.env.CRON_SETTINGS_COLLECTION_NAME).findOneAndUpdate(
-                { CronId: cronId },
-                {
-                    $set:
-                    {
-                        "UpdatedTime": new Date()
-                    }
-                }
-            );
-        }
         dbConnection.close();
     }
     catch (exception) {
@@ -212,30 +72,12 @@ module.exports.ToggleCronStatus = async (cronId, cronStatus) => {
     return mongoResult;
 }
 
-module.exports.PurgeCronBasedOnId = async (cronId) => {
+module.exports.CreateParkingDetails=async(payload)=>{
     let mongoResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).deleteMany({ 'cronId': cronId });
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return mongoResult;
-}
-
-module.exports.PurgeCronBasedOnDate = async (dateString) => {
-    let mongoResult = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        let dbo = dbConnection.db(process.env.GET_REPRICER_DBNAME);
-        mongoResult = await dbo.collection(process.env.GET_CRON_LOGS_COLLECTION_NAME).deleteMany({
-            time: {
-                $lte: new Date(dateString)
-            }
-        });
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        mongoResult = await dbo.collection(process.env.PARKING_INFO).insert(payload);
         dbConnection.close();
     }
     catch (exception) {

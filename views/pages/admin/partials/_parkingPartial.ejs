@@ -1,0 +1,65 @@
+<br />
+<br />
+<div class="d-flex justify-content-between">
+    <h1 class="commanHeading">Configure Parking Details :<b>
+        </b></h1>
+</div>
+<div class="card">
+    <div class="body table-responsive">
+        <table id="location_tbl" class="table table-striped table-bordered" style="width:100%">
+            <thead>
+                <tr>
+                    <th style="font-size: 20px;">Select LTIMindtree Location : </th>
+                    <th><select class="form-select form-control" id="location_ddl" aria-label="Default select example"
+                            onchange="locationSelectionChanged(this)">
+                            <% locations.forEach(function (location) { %>
+                                <option value='<%= location %>'>
+                                    <%= location %>
+                                </option>
+                                <%})%>
+                        </select></th>
+                </tr>
+                <tr>
+                    <td style="font-size: 20px;font-weight: bold;">Select Parking Location :
+                    </td>
+                    <td><select class="form-select form-control" id="parking_location_ddl"
+                            aria-label="Default select example">
+                        </select></td>
+                </tr>
+            </thead>
+        </table>
+        <a onClick="getParkingDetails()" class="btn btn-success mx-1" name="btn_submit_get_details"
+            style="float: right;color: black;"><i class="fa-solid fa-play"></i>
+            &nbsp;Get Details</a>
+        <br /> <br />
+        <div id="details_div" class="d-none">
+        Parking configuration for : <b><span id="lblLocation"></b></span>
+        <br/><br/>
+        <table id="location_details_tbl" class="table table-striped table-bordered" style="width:100%;">
+            <thead>
+                <tr>
+                    <th style="font-size: 20px;">Total Number of 2 Wheeler Parking : </th>
+                    <th><input type="number" class="form-control" name="txtTwoWheelerCount"
+                            placeholder="2 Wheeler Count" readonly /></th>
+                    <th>
+                        <button type="button" onclick="editWheelerCount(2)" class="btn btn-success" name="btnEditTwo">Edit</button>
+                        <button type="button" onclick="saveWheelerCount()" class="btn btn-primary d-none" name="btnSaveTwo">Save</button>
+                        <button type="button" onclick="cancelWheeler(2)" class="btn btn-danger d-none" name="btnCancelTwo">Cancel</button>
+                    </th>
+                </tr>
+                <tr>
+                    <td style="font-size: 20px;font-weight: bold;">Total Number of 4 Wheeler Parking :
+                    </td>
+                    <td><input type="number" class="form-control" name="txtFourWheelerCount"
+                            placeholder="4 Wheeler Count" readonly /></td>
+                    <td>
+                        <button type="button" onclick="editWheelerCount(4)" class="btn btn-success" name="btnEditFour">Edit</button>
+                        <button type="button" onclick="saveWheelerCount()" class="btn btn-primary d-none" name="btnSaveFour">Save</button>
+                        <button type="button" onclick="cancelWheeler(4)" class="btn btn-danger d-none" name="btnCancelFour">Cancel</button>
+                    </td>
+                </tr>
+            </thead>
+        </table>
+        </div>
+    </div>
+</div>

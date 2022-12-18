@@ -5,7 +5,7 @@ exports.index = asyncHandler(async (req, res) => {
     const stored_session = req.session;
     const users_id = stored_session.users_id;
     if (users_id) {
-        res.redirect("/masteritem");
+        res.redirect("/onLoad");
     } else {
         return res.render("pages/index", {
         });

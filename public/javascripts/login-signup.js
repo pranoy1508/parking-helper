@@ -33,7 +33,7 @@ if ($('#sign_in_form').length > 0) {
           if (data.status == 1) {
             showSuccessToast(data.message);
             setTimeout(function () {
-              window.location.href = "masteritem";
+              window.location.href = "onLoad";
             }, 1000);
           } else {
             showErrorToast(data.message);
