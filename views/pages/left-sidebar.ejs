@@ -1,0 +1,34 @@
+<div class="left_sidebar" id="printPageButton">
+  <nav class="sidebar" style="overflow-y: hidden">
+    <ul id="main-menu" class="metismenu" style="height: 100%">
+      <li class="<%=groupName == 'admin' ? 'active' : ''%> mt-2">
+        <a href="/adminControl">
+          <span class="fa-sharp fa-solid fa-user"></span>
+          <span>&nbsp;Admin</span>
+        </a>
+      </li>
+      <li class="<%=groupName == 'item' ? 'active' : ''%> mt-2">
+        <a href="/masteritem" class="">
+          <span class="fa-sharp fa-solid fa-sitemap"></span>
+          <span>&nbsp;Items</span>
+        </a>
+      </li>
+      <li class="<%=groupName == 'dashboard' ? 'active' : ''%> mt-2">
+        <a href="/dashboard" class="">
+          <span class="fa-sharp fa-solid fa-bars-progress"></span>
+          <span>&nbsp;Tasks</span>
+        </a>
+      </li>
+      <li class="<%=groupName == 'settings' ? 'active' : ''%> mt-2">
+        <a href="/cronSettings">
+          <span class="fa-sharp fa-solid fa-gear"></span>
+          <span>&nbsp;Settings</span>
+        </a>
+      </li>
+      <li class="<%=groupName == 'settings' ? 'active' : ''%>">
+        <button type="" id="goDown" class="btn btn-dark rounded-circle text-white mx-1 p-3"><i
+            class="fa-solid fa-chevron-down"></i></button>
+      </li>
+    </ul>
+  </nav>
+</div>

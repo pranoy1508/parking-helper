@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Webpixels">
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+    <title>
+        Park Whiz
+    </title>
+
+    <link rel="stylesheet" href="/vendor/themify-icons/themify-icons.css">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/vendor/chartist/css/chartist.min.css">
+    <!-- <link rel="stylesheet" href="/vendor/chartist-plugin-tooltip/chartist-plugin-tooltip.css"> -->
+    <link rel="stylesheet" href="/vendor/charts-c3/plugin.css" />
+    <link rel="stylesheet" href="/vendor/morrisjs/morris.css">
+    <link rel="stylesheet" href="/vendor/jvectormap/jquery-jvectormap-2.0.3.css" />
+    <link rel="stylesheet" href="/vendor/fullcalendar/fullcalendar.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/jquery.toast.css" type="text/css">
+    <link rel="stylesheet" href="/stylesheets/font-awesome.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<!-- ///// -->
+
+<body>
+    <div class="container">
+        <div class="d-flex justify-content-center h-100">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Sign In</h3>
+                </div>
+                <div class="card-body">
+                    <form id="sign_in_form" method="post" autocomplete="off">
+                        <div class="input-group form-group">
+              <!-- userName -->
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-user px-2"></i></span>
+                            </div>
+                            <input type="text" class="form-control" name="userName" placeholder="username">
+                            
+                        </div>
+                        <div class="input-group form-group">
+                <!-- userPassword -->
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-key px-2"></i></span>
+                            </div>
+                            <input type="password" name="userPassword" class="form-control" placeholder="password">
+                        </div>
+                        <div class="form-group text-center" >
+                            <input type="submit" value="Login" class="btn  login_btn">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+
+
+<!-- ///// -->
+
+
+        <%- include('./footer'); %>
+
+</header>
+<!-- ///// -->
+
+</html>

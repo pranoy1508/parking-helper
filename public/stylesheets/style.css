@@ -1,0 +1,232 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+*{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Poppins', sans-serif;
+}
+
+html 
+{ 
+    scroll-behavior: smooth; 
+}
+body {
+    background: #000 0% 0% no-repeat padding-box;
+    opacity: 1;
+    color: #fff;
+    font-size: 12px;
+    position: relative;
+    background-color: #fff;
+}
+
+ul, 
+ol {
+    margin:0; 
+    padding: 0; 
+    list-style: none;
+}
+
+
+a:hover { 
+    text-decoration:none; 
+    color: #ffcc80 !important;
+}
+a:focus { 
+    color: none;
+    text-decoration: none; 
+    outline: 0;
+}
+img { max-width:100%;}
+h1, h2, h3, h4, h5, h6 { margin: 0px 0 30px 0; opacity: 1;font-family: 'Ubuntu', sans-serif;}
+h1 { font-size: 50px;}
+h2{ font-size: 49px; }
+h3{ font-size: 36px; }
+h4{ font-size: 34px;}
+h5{ font-size: 24px;}
+h6 { font-size: 16px;}
+p{
+    font-size: 16px;
+    color: #000;
+    font-weight: 300;
+    letter-spacing: 0;
+    opacity: 1;
+    font-family: 'Poppins', sans-serif;
+}
+
+b{
+    font-weight: 700 !important;
+}
+
+.mainHeader{
+    /* background-position: top center; */
+    background-position: bottom;
+    background-repeat: no-repeat;
+    background-image: url(../../../uploads/logo/banner.jpg);
+    background-size: cover;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0e90dc;
+    text-align: center;
+}
+
+
+.grid input{
+    border: 1px solid #2ceef8;
+    border-radius: 50px;
+    padding: 7px 15px!important;
+    width: 320px;
+    color: #2ceef8;
+    font-size: 14px;
+}
+
+.grid .form-group{
+    display: flex;
+   
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.loginSec{
+    margin-top: -80px;
+}
+
+.loginSec a{
+    display: inline-block;
+    margin-bottom: 45px;
+}
+form.form .btnSec{
+padding: 4px 35px;
+    border-radius: 2px;
+    outline: none;
+    box-shadow: none;
+    outline: none;
+    border: none;
+}
+
+.form input:focus-visible {
+    outline: none !important;
+    outline-offset: unset !important;
+    padding: 7px 15px !important;
+    box-shadow: none !important;
+}
+
+.form input[placeholder], [placeholder], .form *[placeholder] {
+    color: #000 !important;
+}
+
+::-webkit-input-placeholder {
+   color: #000 !important;
+}
+.form label{
+    margin-right: 10px;
+}
+
+.form .form-control:focus {
+    color: #000 !important;
+    background-color: #fff !important;;
+    border-color: transparent !important;;
+    outline: 0 !important;;
+    box-shadow: unset !important;;
+}
+
+/* .@media (min-width: 991px){
+    form.form {
+    width: 500px;
+    margin: 40px auto 0px;
+}
+} */
+
+
+/* //////////////////////// */
+
+@import url('https://fonts.googleapis.com/css?family=Numans');
+
+html,body{
+background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+background-size: cover;
+background-repeat: no-repeat;
+height: 100%;
+font-family: 'Numans', sans-serif;
+}
+
+.container{
+height: 100%;
+align-content: center;
+}
+
+.card{
+height: 370px;
+margin-top: auto;
+margin-bottom: auto;
+width: 400px;
+background-color: rgba(0,0,0,0.5) !important;
+}
+
+.social_icon span{
+font-size: 60px;
+margin-left: 10px;
+color: #FFC312;
+}
+
+.social_icon span:hover{
+color: white;
+cursor: pointer;
+}
+
+.card-header h3{
+color: white;
+}
+
+.social_icon{
+position: absolute;
+right: 20px;
+top: -45px;
+}
+
+.input-group-prepend span{
+width: 50px;
+background-color: #FFC312;
+color: black;
+border:0 !important;
+}
+
+input:focus{
+outline: 0 0 0 0  !important;
+box-shadow: 0 0 0 0 !important;
+
+}
+
+.remember{
+color: white;
+}
+
+.remember input
+{
+width: 20px;
+height: 20px;
+margin-left: 15px;
+margin-right: 5px;
+}
+
+.login_btn{
+color: black;
+background-color: #FFC312;
+width: 100px;
+}
+
+.login_btn:hover{
+color: black;
+background-color: white;
+}
+
+.links{
+color: white;
+}
+
+.links a{
+margin-left: 4px;
+}
