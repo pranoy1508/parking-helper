@@ -96,7 +96,7 @@ function getParkingDetails() {
         },
         success: function (data) {
             showSuccessToast("Success");
-            $('#lblLocation').text($("#parking_location_ddl").text());
+            $('#lblLocation').text($("#parking_location_ddl option:selected").text());
             $('#details_div').removeClass("d-none");
             $('[name="txtTwoWheelerCount"]').val(data && data.NoOfTwoWheelerParking ? parseInt(data.NoOfTwoWheelerParking) : 0);
             $('[name="txtFourWheelerCount"]').val(data && data.NoOfFourWheelerParking ? parseInt(data.NoOfFourWheelerParking) : 0);
@@ -130,7 +130,7 @@ function saveWheelerCount() {
         type: "POST",
         url: `http://localhost:3033/admin/update_location_details`,
         cache: false,
-        data: { "locationId": locationId, "twoWheelerCount": twoWheelerCount, "fourWheelerCount": fourWheelerCount},
+        data: { "locationId": locationId, "twoWheelerCount": twoWheelerCount, "fourWheelerCount": fourWheelerCount },
         dataType: "json",
         beforeSend: function () {
             showLoadingToast("Updating parking details...");
@@ -151,14 +151,52 @@ function cancelWheeler(wheelerCount) {
         $('[name="btnSaveTwo"]').addClass("d-none");
         $('[name="btnCancelTwo"]').addClass("d-none");
         $('[name="btnEditTwo"]').removeClass("d-none");
-        $('[name="txtTwoWheelerCount"]').attr("readonly",true);
+        $('[name="txtTwoWheelerCount"]').attr("readonly", true);
     }
     else if (wheelerCount == 4) {
         $('[name="btnSaveFour"]').addClass("d-none");
         $('[name="btnCancelFour"]').addClass("d-none");
         $('[name="btnEditFour"]').removeClass("d-none");
-        $('[name="txtFourWheelerCount"]').attr("readonly",true);
+        $('[name="txtFourWheelerCount"]').attr("readonly", true);
     }
     getParkingDetails();
 
+}
+
+function addUser() {
+    $('[name="div_add_user"]').removeClass("d-none");
+}
+
+function cancelUserAddition() {
+    $('[name="div_add_user"]').addClass("d-none");
+}
+
+function saveUser() {
+    const userName = $('[name="add_userName"]').val();
+    const role = $('[name="add_user_role"]').val();
+    $.ajax({
+        type: "POST",
+        url: `http://localhost:3033/user/add_user`,
+        cache: false,
+        data: { "userName": userName, "role": role },
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("Adding user details...");
+        },
+        success: function (data) {
+            if (data.statusCode==2020 || data.statusCode==2021)
+            {
+                showErrorToast(data.message);
+            }
+            else{
+                showSuccessToast(data.message);
+                setTimeout(function () {
+                    location.reload();
+                }, 3000);
+            }
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
 }

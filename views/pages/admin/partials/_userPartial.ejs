@@ -1,0 +1,74 @@
+<br />
+<br />
+<div class="d-flex justify-content-between">
+    <h1 class="commanHeading">Configure User Details :<b>
+        </b></h1>
+    <button type="button" onclick="addUser()" class="btn btn-success fa fa-solid fa-plus" name="btnAddUser"> Add
+        User</button>
+</div>
+<br />
+<div class="card">
+    <div class="body table-responsive">
+        <table id="user_tbl" class="table table-striped table-bordered" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>UserName</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(items.userDetails.length===0) { %>
+                    <p>No users found !</p>
+                    <% } else {let i=1 ; items.userDetails.forEach(function(user){ %>
+                        <tr>
+                            <td>
+                                <%= i %>
+                            </td>
+                            <td><input type="text" class="form-control" value="<%= user.userName %>" name="userName"
+                                    placeholder="User Name" readonly /></td>
+                            <td><input type="text" class="form-control" value="<%= user.userPassword %>"
+                                    name="password" placeholder="Password" readonly /></td>
+                            <td><input type="text" class="form-control" value="<%= user.userRole %>" name="Role"
+                                    placeholder="User Role" readonly /></td>
+
+                        </tr>
+                        <% i++; }); } %>
+            </tbody>
+        </table>
+        <br><br>
+        <div class="container d-none" name="div_add_user">
+            <h5>Addition of User : </h5>
+            <br>
+            <table id="user_add_tbl" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <th>UserName</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" name="add_userName" placeholder="Enter the user Name">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="password" placeholder="Password will be auto-generated"
+                                readonly>
+                        </td>
+                        <td>
+                            <select class="form-select form-control" name="add_user_role"
+                                aria-label="Default select example">
+                                <option value="USER">User</option>
+                                <option value="OWNER">Owner</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" onclick="saveUser()" class="btn btn-primary" name="btnSaveUser">Save</button>
+            <button type="button" onclick="cancelUserAddition()" class="btn btn-danger" style="float: right;" name="btnCancelUserAddition">Cancel</button>
+        </div>
+    </div>
+</div>

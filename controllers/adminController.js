@@ -4,9 +4,13 @@ const ParkingDetails=require("../models/parkingDetails");
 
 const onLoad = asyncHandler(async (req, res) => {
     const officeDetails = await mongoMiddleware.GetAllOfficeLocations();
+    const userDetails=await mongoMiddleware.GetAllUsers();
     officeDetails.unshift("-- Please Select --");
+    let loadDetails={};
+    loadDetails.officeDetails = officeDetails;
+    loadDetails.userDetails = userDetails;
     res.render("pages/admin/index", {
-        locations: officeDetails,
+        items: loadDetails,
         groupName: "admin"
     });
 });
@@ -34,14 +38,14 @@ const updateLocationDetails = asyncHandler(async (req, res) => {
     }
     else if (parseInt(payload.twoWheelerCount) == response.NoOfTwoWheelerParking && parseInt(payload.fourWheelerCount) == response.NoOfFourWheelerParking) {
         return res.json({
-            "statusCode": 9999,
-            "message": "No changes found to update"
+            statusCode: 9999,
+            message: "No changes found to update"
         });
     }
     else {
         await mongoMiddleware.UpdateParkingDetails(payload);
     }
-    return res.json({"statusCode":200,"message":"Updated Successfully"});
+    return res.json({statusCode:200,message:"Updated Successfully"});
 });
 
 

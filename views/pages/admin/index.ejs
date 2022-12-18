@@ -9,7 +9,8 @@
                         <li class="nav-item active "><a href="#configurationTab" role="tab" data-toggle="tab"
                                 class="nav-link active fa fa-cog"> Configuration</a>
                         </li>
-                        <li class="nav-item"><a href="#UsersTab" role="tab" data-toggle="tab" class="nav-link fa fa-user"> Users</a>
+                        <li class="nav-item"><a href="#UsersTab" role="tab" data-toggle="tab"
+                                class="nav-link fa fa-user"> Users</a>
                         </li>
                         <li class="nav-item"><a href="#WorklistsTab" role="tab" data-toggle="tab"
                                 class="nav-link fa fa-server"> WorkLists</a></li>
@@ -22,7 +23,9 @@
                         <div class="tab-pane container active" id="configurationTab">
                             <%- include('partials/_parkingPartial.ejs') %>
                         </div>
-                        <div class="tab-pane container fade" id="UsersTab">C# is also a programming language</div>
+                        <div class="tab-pane container fade" id="UsersTab">
+                            <%- include('partials/_userPartial.ejs')%>
+                        </div>
                         <div class="tab-pane container fade" id="WorklistsTab">MySQL is a databased mostly used for web
                             applications.
                         </div>

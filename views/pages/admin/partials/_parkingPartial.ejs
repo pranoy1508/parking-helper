@@ -12,7 +12,7 @@
                     <th style="font-size: 20px;">Select LTIMindtree Location : </th>
                     <th><select class="form-select form-control" id="location_ddl" aria-label="Default select example"
                             onchange="locationSelectionChanged(this)">
-                            <% locations.forEach(function (location) { %>
+                            <% items.officeDetails.forEach(function (location) { %>
                                 <option value='<%= location %>'>
                                     <%= location %>
                                 </option>

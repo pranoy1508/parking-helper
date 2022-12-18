@@ -2,6 +2,7 @@ const Express = require("express");
 const Auth = require("../middleware/is-auth.js");
 const loginController=require("../controllers/loginController.js");
 const adminController=require("../controllers/adminController.js");
+const userController=require("../controllers/userController");
 
 const router = Express.Router();
 
@@ -15,5 +16,7 @@ router.post("/admin/get_parking_locations", Auth, adminController.getParkingLoca
 router.post("/admin/get_location_details", Auth, adminController.getParkingDetails);
 router.post("/admin/update_location_details",Auth,adminController.updateLocationDetails);
 
+router.post("/user/add_user",Auth,userController.addUser);
 
-module.exports = router;
+
+module.exports = router; 
