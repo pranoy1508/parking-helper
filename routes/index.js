@@ -3,6 +3,7 @@ const Auth = require("../middleware/is-auth.js");
 const loginController=require("../controllers/loginController.js");
 const adminController=require("../controllers/adminController.js");
 const userController=require("../controllers/userController");
+const parkingController=require("../controllers/parkingController.js");
 
 const router = Express.Router();
 
@@ -17,6 +18,10 @@ router.post("/admin/get_location_details", Auth, adminController.getParkingDetai
 router.post("/admin/update_location_details",Auth,adminController.updateLocationDetails);
 
 router.post("/user/add_user",Auth,userController.addUser);
+
+
+
+router.get("/openSecurity", Auth, parkingController.onLoad);
 
 
 module.exports = router; 
