@@ -22,6 +22,7 @@ router.post("/user/add_user",Auth,userController.addUser);
 
 
 router.get("/openSecurity", Auth, parkingController.onLoad);
+router.post("/parking/create_parking_log", Auth, parkingController.addParkingLogs);
 
 
 module.exports = router; 

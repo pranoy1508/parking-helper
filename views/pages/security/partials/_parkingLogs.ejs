@@ -1,0 +1,136 @@
+<br />
+<br />
+<div class="card">
+    <div class="body table-responsive">
+        <div class="container">
+            <table id="parking_info_tbl" class="table table-striped table-bordered" style="width:100%">
+                <tbody>
+                    <tr>
+                        <th style="font-size: 20px;">Select LTIMindtree Location : </th>
+                        <th><select class="form-select form-control" id="location_ddl_sec"
+                                aria-label="Default select example"
+                                onchange="locationSelectionUpdated(this,'<%= JSON.stringify(items)  %>')">
+                                <% items.forEach(function (location) { %>
+                                    <option value='<%= location.OfficeLocation %>'>
+                                        <%= location.OfficeLocation %>
+                                    </option>
+                                    <%})%>
+                            </select></th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 20px;font-weight: bold;">Select Parking Location :
+                        </td>
+                        <td><select class="form-select form-control" id="parking_location_ddl_sec"
+                                aria-label="Default select example"
+                                onchange="parkingSelectionChanged(this,'<%= JSON.stringify(items)  %>')">
+                                <% items[0].ParkingLocations.forEach(function (parking) { %>
+                                    <option value='<%= parking.LocationId %>'>
+                                        <%= parking.LocationName %>
+                                    </option>
+                                    <%})%>
+                            </select></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-info mx-1" data-toggle="modal" style="float: right;"
+                data-target="#detailsModal"><i class="fa-solid fa-circle-info"></i> Show Parking Status
+            </button>
+            <br />
+
+            <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4>Parking Status: </h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="parking_info_details" class="table table-striped table-bordered"
+                                style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th style="font-size: 15px;">Total Number of 2 Wheeler Parking : </th>
+                                        <th><input type="number" class="form-control" name="secTxtTwoWheelerCount"
+                                                placeholder="Total 2 Wheeler Count" readonly
+                                                value="<%= items[0].ParkingLocations[0].TotalTwoWheelerCount %>" />
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 15px;">Total Number of 4 Wheeler Parking : </th>
+                                        <th><input type="number" class="form-control" name="secTxtFourWheelerCount"
+                                                placeholder="Total 4 Wheeler Count" readonly
+                                                value="<%= items[0].ParkingLocations[0].TotalFourWheelerCount %>" />
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 15px;color:green">Available 2 Wheeler Parking Spaces :
+                                        </th>
+                                        <th><input type="number" class="form-control" name="secTxtAvlTwoWheelerCount"
+                                                placeholder="Available 2 Wheeler Parking Spaces" readonly
+                                                value="<%= items[0].ParkingLocations[0].AvailableTwoWheelerCount %>"
+                                                style="color:green;font-weight:bold;" />
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 15px;color:green">Available 4 Wheeler Parking Spaces :
+                                        </th>
+                                        <th><input type="number" class="form-control" name="secTxtAvlFourWheelerCount"
+                                                placeholder="Available 4 Wheeler Parking Spaces" readonly
+                                                value="<%= items[0].ParkingLocations[0].AvailableFourWheelerCount %>"
+                                                style="color:green;font-weight:bold;" />
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <h5>Addition of Parking Logs : </h5>
+            <br>
+            <table id="parking_log_add_tbl" class="table table-striped table-bordered" style="width:100%">
+                <tbody>
+                    <thead style="font-weight: bold;">
+                        <td>Id</td>
+                        <td>Name</td>
+                        <td>Vehicle No.</td>
+                        <td>Vehicle Type</td>
+                        <td>RFID No.</td>
+                    </thead>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" id="sec_empid" placeholder="Enter the Employee Id">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" id="sec_empName"
+                                placeholder="Enter the Employee Name">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" id="sec_vehicleNo"
+                                placeholder="Enter the Vehicle Number">
+                        </td>
+                        <td>
+                            <select class="form-select form-control" id="sec_vehicleType"
+                                aria-label="Default select example">
+                                <option value=0 selected>2Wheeler</option>
+                                <option value=1>4Wheeler</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" id="sec_rfidNo" placeholder="Enter the RFID No.">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" onclick="saveParkingLog()" class="btn btn-primary">Save</button>
+            <button type="button" onclick="resetParkingLog()" class="btn btn-danger"
+                style="float: right;">Cancel</button>
+        </div>
+    </div>
+</div>

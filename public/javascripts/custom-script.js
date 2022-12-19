@@ -59,7 +59,7 @@ function locationSelectionChanged(item) {
     } else {
         $.ajax({
             type: "POST",
-            url: `http://localhost:3033/admin/get_parking_locations`,
+            url: `/admin/get_parking_locations`,
             cache: false,
             data: { "officeLocation": item.value },
             dataType: "json",
@@ -87,7 +87,7 @@ function getParkingDetails() {
     var locationId = $('#parking_location_ddl').val();
     $.ajax({
         type: "POST",
-        url: `http://localhost:3033/admin/get_location_details`,
+        url: `/admin/get_location_details`,
         cache: false,
         data: { "locationId": locationId },
         dataType: "json",
@@ -128,7 +128,7 @@ function saveWheelerCount() {
     const fourWheelerCount = $('[name="txtFourWheelerCount"]').val();
     $.ajax({
         type: "POST",
-        url: `http://localhost:3033/admin/update_location_details`,
+        url: `/admin/update_location_details`,
         cache: false,
         data: { "locationId": locationId, "twoWheelerCount": twoWheelerCount, "fourWheelerCount": fourWheelerCount },
         dataType: "json",
@@ -176,7 +176,7 @@ function saveUser() {
     const role = $('[name="add_user_role"]').val();
     $.ajax({
         type: "POST",
-        url: `http://localhost:3033/user/add_user`,
+        url: `/user/add_user`,
         cache: false,
         data: { "userName": userName, "role": role },
         dataType: "json",
@@ -184,11 +184,10 @@ function saveUser() {
             showLoadingToast("Adding user details...");
         },
         success: function (data) {
-            if (data.statusCode==2020 || data.statusCode==2021)
-            {
+            if (data.statusCode == 2020 || data.statusCode == 2021) {
                 showErrorToast(data.message);
             }
-            else{
+            else {
                 showSuccessToast(data.message);
                 setTimeout(function () {
                     location.reload();
@@ -200,3 +199,72 @@ function saveUser() {
         },
     });
 }
+
+function locationSelectionUpdated(ddlOption, items) {
+    const contextParkingDetails = JSON.parse(items);
+    contextParkingDetails.forEach(loc => {
+        if (loc.OfficeLocation == ddlOption.value && loc.ParkingLocations && loc.ParkingLocations.length > 0) {
+            loc.ParkingLocations.forEach($opt => {
+                if ($opt.IsActive == true) {
+                    $('#parking_location_ddl_sec').append(new Option($opt.LocationName, $opt.LocationId));
+                }
+            });
+        }
+    });
+}
+
+function parkingSelectionChanged(ddlOption, items) {
+    const contextParkingDetails = JSON.parse(items);
+    contextParkingDetails.forEach(loc => {
+        if (loc.ParkingLocations && loc.ParkingLocations.length > 0) {
+            loc.ParkingLocations.forEach($p => {
+                if ($p.LocationId == ddlOption.value) {
+                    $('[name="secTxtTwoWheelerCount"]').val($p.TotalTwoWheelerCount);
+                    $('[name="secTxtFourWheelerCount"]').val($p.TotalFourWheelerCount);
+                    $('[name="secTxtAvlTwoWheelerCount"]').val($p.AvailableTwoWheelerCount);
+                    $('[name="secTxtAvlFourWheelerCount"]').val($p.AvailableFourWheelerCount);
+                }
+            });
+        }
+    });
+}
+
+function saveParkingLog() {
+    let parkingLog={};
+    parkingLog.empId = $('#sec_empid').val();
+    parkingLog.empName = $('#sec_empName').val();
+    parkingLog.vehicleNumber =$('#sec_vehicleNo').val();
+    parkingLog.vehicleType = $('#sec_vehicleType').val();
+    parkingLog.rfid = $('#sec_rfidNo').val();
+    parkingLog.parkingLocation = $('#parking_location_ddl_sec').val();
+    $.ajax({
+        type: "POST",
+        url: `/parking/create_parking_log`,
+        cache: false,
+        data: parkingLog,
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("Adding details...");
+        },
+        success: function (data) {
+            if (data.statusCode == 4021 || data.statusCode == 4022) {
+                showErrorToast(data.message);
+            }
+            else {
+                showSuccessToast(data.message);
+                resetParkingLog();
+            }
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
+}
+
+function resetParkingLog() {
+    $('#sec_empid').val(null);
+    $('#sec_empName').val(null);
+    $('#sec_vehicleNo').val(null);
+    $('#sec_vehicleType').val(0);
+    $('#sec_rfidNo').val(null);
+}   

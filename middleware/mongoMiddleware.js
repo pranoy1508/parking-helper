@@ -97,3 +97,18 @@ module.exports.GetAllUsers=async()=>{
     }
     return userDetails;
 }
+
+
+module.exports.GetFullOfficeLocations = async () => {
+    let officeLocationDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        officeLocationDetails = await dbo.collection(process.env.LOCATIONS_COLLECTIONS_NAME).find().toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return officeLocationDetails;
+}
