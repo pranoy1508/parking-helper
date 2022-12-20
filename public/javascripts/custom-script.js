@@ -227,13 +227,14 @@ function parkingSelectionChanged(ddlOption, items) {
             });
         }
     });
+    validateAddition(contextParkingDetails);
 }
 
 function saveParkingLog() {
-    let parkingLog={};
+    let parkingLog = {};
     parkingLog.empId = $('#sec_empid').val();
     parkingLog.empName = $('#sec_empName').val();
-    parkingLog.vehicleNumber =$('#sec_vehicleNo').val();
+    parkingLog.vehicleNumber = $('#sec_vehicleNo').val();
     parkingLog.vehicleType = $('#sec_vehicleType').val();
     parkingLog.rfid = $('#sec_rfidNo').val();
     parkingLog.parkingLocation = $('#parking_location_ddl_sec').val();
@@ -247,7 +248,7 @@ function saveParkingLog() {
             showLoadingToast("Adding details...");
         },
         success: function (data) {
-            if (data.statusCode == 4021 || data.statusCode == 4022) {
+            if (data.statusCode == 4021 || data.statusCode == 4022 || data.statusCode == 4023) {
                 showErrorToast(data.message);
             }
             else {
@@ -267,4 +268,48 @@ function resetParkingLog() {
     $('#sec_vehicleNo').val(null);
     $('#sec_vehicleType').val(0);
     $('#sec_rfidNo').val(null);
-}   
+}
+
+function validateAddition(items) {
+    const locationId = $('#parking_location_ddl_sec').val();
+    items.forEach(loc => {
+        if (loc.ParkingLocations && loc.ParkingLocations.length > 0) {
+            loc.ParkingLocations.forEach($p => {
+                if ($p.LocationId == locationId) {
+                    if ($p.AvailableTwoWheelerCount == 0 && $p.AvailableFourWheelerCount == 0)
+                    {
+                        $('#sec_empid').attr('disabled', 'disabled');
+                        $('#sec_empName').attr('disabled', 'disabled');
+                        $('#sec_vehicleNo').attr('disabled', 'disabled');
+                        $('#sec_vehicleType').attr('disabled', 'disabled');
+                        $('#sec_rfidNo').attr('disabled', 'disabled');
+                        $('#btnSaveParkingLog').attr('disabled', 'disabled');
+                        $('#btnCancelParkingLog').attr('disabled', 'disabled');
+                    }
+                    else if ($p.AvailableTwoWheelerCount == 0 && $p.AvailableFourWheelerCount>0)
+                    {
+                        $('#sec_vehicleType').find('option[value=0]').remove();
+                    }
+                    else if ($p.AvailableTwoWheelerCount > 0 && $p.AvailableFourWheelerCount == 0) {
+                        $('#sec_vehicleType').find('option[value=1]').remove();
+                    }
+                    else{
+                        $('#sec_empid').removeAttr('disabled');
+                        $('#sec_empName').removeAttr('disabled');
+                        $('#sec_vehicleNo').removeAttr('disabled');
+                        $('#sec_vehicleType').removeAttr('disabled');
+                        $('#sec_rfidNo').removeAttr('disabled');
+                        $('#btnSaveParkingLog').removeAttr('disabled');
+                        $('#btnCancelParkingLog').removeAttr('disabled');
+                        $('#sec_vehicleType').find('option[value=0]').remove();
+                        $('#sec_vehicleType').find('option[value=1]').remove();
+                        $('#sec_vehicleType').append(new Option('2Wheeler', 0));
+                        $('#sec_vehicleType').append(new Option('4Wheeler', 1));
+                    }
+
+                }
+            });
+        }
+    });
+    return false;
+}

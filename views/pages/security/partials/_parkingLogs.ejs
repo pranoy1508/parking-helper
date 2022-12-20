@@ -105,32 +105,32 @@
                     </thead>
                     <tr>
                         <td>
-                            <input type="text" class="form-control" id="sec_empid" placeholder="Enter the Employee Id">
+                            <input type="text" class="form-control" id="sec_empid" placeholder="Enter the Employee Id" <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %> >
                         </td>
                         <td>
                             <input type="text" class="form-control" id="sec_empName"
-                                placeholder="Enter the Employee Name">
+                                placeholder="Enter the Employee Name" <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %>>
                         </td>
                         <td>
                             <input type="text" class="form-control" id="sec_vehicleNo"
-                                placeholder="Enter the Vehicle Number">
+                                placeholder="Enter the Vehicle Number" <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %>>
                         </td>
                         <td>
                             <select class="form-select form-control" id="sec_vehicleType"
-                                aria-label="Default select example">
+                                aria-label="Default select example" <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %>>
                                 <option value=0 selected>2Wheeler</option>
                                 <option value=1>4Wheeler</option>
                             </select>
                         </td>
                         <td>
-                            <input type="number" class="form-control" id="sec_rfidNo" placeholder="Enter the RFID No.">
+                            <input type="number" class="form-control" id="sec_rfidNo" placeholder="Enter the RFID No." <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %>>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <button type="button" onclick="saveParkingLog()" class="btn btn-primary">Save</button>
-            <button type="button" onclick="resetParkingLog()" class="btn btn-danger"
-                style="float: right;">Cancel</button>
+            <button type="button" onclick="saveParkingLog()"  id="btnSaveParkingLog" class="btn btn-primary" <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %>>Save</button>
+            <button type="button" onclick="resetParkingLog()" id="btnCancelParkingLog" class="btn btn-danger"
+                style="float: right;" <%= items[0].ParkingLocations[0].AvailableFourWheelerCount==0 && items[0].ParkingLocations[0].AvailableTwoWheelerCount== 0 ? 'disabled' : '' %>>Cancel</button>
         </div>
     </div>
 </div>

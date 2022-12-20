@@ -6,14 +6,19 @@ const ParkingLogs = require("../models/parkingLogs");
 
 const onLoad = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const sysDate = new Date().toISOString().split('T')[0];
+    const startDate =`${sysDate}T00:00:00`;
+    const endDate = `${sysDate}T23:59:59`;
     for (let office of officeDetails) {
         if (office.ParkingLocations) {
             for (let parking of office.ParkingLocations) {
+                const twoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0,parking.LocationId,startDate,endDate);
+                const fourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, startDate, endDate);
                 const locationIdDetails = await mongoMiddleware.GetParkingDetails(parking.LocationId);
                 parking.TotalTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking;
                 parking.TotalFourWheelerCount = locationIdDetails.NoOfFourWheelerParking;
-                parking.AvailableTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking;
-                parking.AvailableFourWheelerCount = locationIdDetails.NoOfFourWheelerParking;
+                parking.AvailableTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking - twoWheelerCount;
+                parking.AvailableFourWheelerCount = locationIdDetails.NoOfFourWheelerParking - fourWheelerCount;
                 parking.RequestedTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking;
                 parking.RequestedFourWheelerCount = locationIdDetails.NoOfFourWheelerParking;
             }
@@ -49,11 +54,17 @@ const addParkingLogs = asyncHandler(async (req, res) => {
             message: "Parking Location is mandatory. Please select a parking location and try again",
         });
     }
-    const addedLogResult = await ParkingLogs.create(parkingLog);
-    if (addedLogResult._id) {
+    const addedLogResult = await mongoMiddleware.CreateParkingLog(parkingLog);
+    if (addedLogResult.insertedCount && addedLogResult.insertedCount==1) {
         return res.json({
             statusCode: 200,
             message: "Log added successfully.",
+        });
+    }
+    else {
+        return res.json({
+            statusCode: 4023,
+            message: "Sorry some error occurred.",
         });
     }
 

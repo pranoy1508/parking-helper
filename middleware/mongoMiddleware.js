@@ -1,7 +1,7 @@
 const mongoClient = require("mongodb").MongoClient;
 
 module.exports.GetAllOfficeLocations = async () => {
-    let officeLocationDetails=null;
+    let officeLocationDetails = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
@@ -29,8 +29,7 @@ module.exports.GetParkingLocationsByOffice = async (officeName) => {
     return parkingLocationsDetails.ParkingLocations;
 }
 
-module.exports.GetParkingDetails=async(locationId)=>
-{
+module.exports.GetParkingDetails = async (locationId) => {
     let parkingDetails = null;
     try {
         const query = { "LocationId": locationId };
@@ -45,7 +44,7 @@ module.exports.GetParkingDetails=async(locationId)=>
     return parkingDetails;
 }
 
-module.exports.UpdateParkingDetails=async(payload)=>{
+module.exports.UpdateParkingDetails = async (payload) => {
     let mongoResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -57,8 +56,8 @@ module.exports.UpdateParkingDetails=async(payload)=>{
                 {
                     "NoOfTwoWheelerParking": parseInt(payload.twoWheelerCount),
                     "NoOfFourWheelerParking": parseInt(payload.fourWheelerCount),
-                    "UpdatedAt":new Date(),
-                    "UpdatedBy":payload.user
+                    "UpdatedAt": new Date(),
+                    "UpdatedBy": payload.user
                 }
             }
         );
@@ -70,7 +69,7 @@ module.exports.UpdateParkingDetails=async(payload)=>{
     return mongoResult;
 }
 
-module.exports.CreateParkingDetails=async(payload)=>{
+module.exports.CreateParkingDetails = async (payload) => {
     let mongoResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -84,7 +83,7 @@ module.exports.CreateParkingDetails=async(payload)=>{
     return mongoResult;
 }
 
-module.exports.GetAllUsers=async()=>{
+module.exports.GetAllUsers = async () => {
     let userDetails = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -98,6 +97,19 @@ module.exports.GetAllUsers=async()=>{
     return userDetails;
 }
 
+module.exports.CreateParkingLog=async(payload)=>{
+    let parkingLogResult = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        parkingLogResult = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).insert(payload);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return parkingLogResult;
+}
 
 module.exports.GetFullOfficeLocations = async () => {
     let officeLocationDetails = null;
@@ -111,4 +123,26 @@ module.exports.GetFullOfficeLocations = async () => {
         console.log(exception);
     }
     return officeLocationDetails;
+}
+
+module.exports.GetVehicleCountByType = async (_vehicleType, _locationId, startDate, endDate) => {
+    let vehicleCount = 0;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        const query = {
+            vehicleType: _vehicleType, parkingLocation: _locationId, parkingDate:
+            {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            }
+        };
+        var res = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).find(query).toArray();
+        vehicleCount = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).countDocuments(query);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return vehicleCount;
 }
