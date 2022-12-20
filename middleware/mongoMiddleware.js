@@ -145,3 +145,32 @@ module.exports.GetVehicleCountByType = async (_vehicleType, _locationId, startDa
     }
     return vehicleCount;
 }
+
+module.exports.GetAllVehicleInformation=async()=>{
+    let vehicleDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        vehicleDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).find().toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return vehicleDetails;
+}
+
+module.exports.GetVehicleInformationByName = async (userName) => {
+    let vehicleDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        const query = { "ownerName": userName };
+        vehicleDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).find(query).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return vehicleDetails;
+}

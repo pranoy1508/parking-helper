@@ -6,6 +6,7 @@ const ParkingLogs = require("../models/parkingLogs");
 
 const onLoad = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const vehicleDetails=await mongoMiddleware.GetAllVehicleInformation();
     const sysDate = new Date().toISOString().split('T')[0];
     const startDate =`${sysDate}T00:00:00`;
     const endDate = `${sysDate}T23:59:59`;
@@ -24,8 +25,11 @@ const onLoad = asyncHandler(async (req, res) => {
             }
         }
     }
+    let responseDetails={};
+    responseDetails.officeDetails=officeDetails;
+    responseDetails.vehicleDetails = vehicleDetails;
     res.render("pages/security/index", {
-        items: officeDetails,
+        items: responseDetails,
         groupName: "security"
     });
 });

@@ -4,6 +4,7 @@ const loginController=require("../controllers/loginController.js");
 const adminController=require("../controllers/adminController.js");
 const userController=require("../controllers/userController");
 const parkingController=require("../controllers/parkingController.js");
+const dashboardController=require("../controllers/dashboardController.js");
 
 const router = Express.Router();
 
@@ -19,7 +20,7 @@ router.post("/admin/update_location_details",Auth,adminController.updateLocation
 
 router.post("/user/add_user",Auth,userController.addUser);
 
-
+router.get("/dashboard", Auth, dashboardController.onLoad);
 
 router.get("/openSecurity", Auth, parkingController.onLoad);
 router.post("/parking/create_parking_log", Auth, parkingController.addParkingLogs);

@@ -230,7 +230,8 @@ function parkingSelectionChanged(ddlOption, items) {
     validateAddition(contextParkingDetails);
 }
 
-function saveParkingLog() {
+function saveParkingLog(vehicleStr) {
+    const contextVehicleDetails = JSON.parse(vehicleStr);
     let parkingLog = {};
     parkingLog.empId = $('#sec_empid').val();
     parkingLog.empName = $('#sec_empName').val();
@@ -238,6 +239,11 @@ function saveParkingLog() {
     parkingLog.vehicleType = $('#sec_vehicleType').val();
     parkingLog.rfid = $('#sec_rfidNo').val();
     parkingLog.parkingLocation = $('#parking_location_ddl_sec').val();
+    contextVehicleDetails.forEach(vehicle => {
+        if (vehicle.ownerEmployeeId==parkingLog.empId) {
+            parkingLog.vehicleNumber = vehicle.vehicleNumber;
+        }
+    });
     $.ajax({
         type: "POST",
         url: `/parking/create_parking_log`,
@@ -312,4 +318,19 @@ function validateAddition(items) {
         }
     });
     return false;
+}
+
+function autoPopulateDetails(vehicleStr)
+{
+    const contextVehicleDetails=JSON.parse(vehicleStr);
+    const inputKey = $("#sec_vehicleNo").val();
+    contextVehicleDetails.forEach(vehicle=>{
+        if (vehicle.vehicleNumber.indexOf(inputKey)>-1)
+        {
+            $('#sec_empid').val(vehicle.ownerEmployeeId);
+            $('#sec_empName').val(vehicle.ownerName);
+            $('#sec_vehicleType').val(vehicle.vehicleType);
+        }
+    });
+
 }
