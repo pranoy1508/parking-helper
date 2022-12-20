@@ -24,6 +24,7 @@ router.get("/dashboard", Auth, dashboardController.onLoad);
 
 router.get("/openSecurity", Auth, parkingController.onLoad);
 router.post("/parking/create_parking_log", Auth, parkingController.addParkingLogs);
+router.post("/parking/submitReservation",Auth,parkingController.submitReservationRequest);
 
 
 module.exports = router; 

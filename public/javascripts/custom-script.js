@@ -41,14 +41,14 @@ function showErrorToast(msg) {
 }
 
 $('.minDatePicker').datepicker({
-    dateFormat: "dd/mm/yy",
+    dateFormat: "yy-mm-dd",
     changeYear: true,
-    maxDate: 0,
-    yearRange: '-100:+0'
+    minDate: 0,
+    yearRange: '-0:+1'
 });
 
 $('.endDatePicker').datepicker({
-    dateFormat: "dd/mm/yy",
+    dateFormat: "yy-mm-dd",
     changeYear: true
 });
 
@@ -200,6 +200,19 @@ function saveUser() {
     });
 }
 
+function locationSelectionUpdatedForRes(ddlOption, items) {
+    const contextParkingDetails = JSON.parse(items);
+    contextParkingDetails.forEach(loc => {
+        if (loc.OfficeLocation == ddlOption.value && loc.ParkingLocations && loc.ParkingLocations.length > 0) {
+            loc.ParkingLocations.forEach($opt => {
+                if ($opt.IsActive == true) {
+                    $('#parking_location_ddl_res').append(new Option($opt.LocationName, $opt.LocationId));
+                }
+            });
+        }
+    });
+}
+
 function locationSelectionUpdated(ddlOption, items) {
     const contextParkingDetails = JSON.parse(items);
     contextParkingDetails.forEach(loc => {
@@ -230,6 +243,23 @@ function parkingSelectionChanged(ddlOption, items) {
     validateAddition(contextParkingDetails);
 }
 
+function parkingSelectionChangedForRes(ddlOption, items) {
+    const contextParkingDetails = JSON.parse(items);
+    contextParkingDetails.forEach(loc => {
+        if (loc.ParkingLocations && loc.ParkingLocations.length > 0) {
+            loc.ParkingLocations.forEach($p => {
+                if ($p.LocationId == ddlOption.value) {
+                    $('[name="resTxtTwoWheelerCount"]').val($p.TotalTwoWheelerCount);
+                    $('[name="resTxtFourWheelerCount"]').val($p.TotalFourWheelerCount);
+                    $('[name="resTxtAvlTwoWheelerCount"]').val($p.AvailableTwoWheelerCount);
+                    $('[name="resTxtAvlFourWheelerCount"]').val($p.AvailableFourWheelerCount);
+                }
+            });
+        }
+    });
+    validateAddition(contextParkingDetails);
+}
+
 function saveParkingLog(vehicleStr) {
     const contextVehicleDetails = JSON.parse(vehicleStr);
     let parkingLog = {};
@@ -240,7 +270,7 @@ function saveParkingLog(vehicleStr) {
     parkingLog.rfid = $('#sec_rfidNo').val();
     parkingLog.parkingLocation = $('#parking_location_ddl_sec').val();
     contextVehicleDetails.forEach(vehicle => {
-        if (vehicle.ownerEmployeeId==parkingLog.empId) {
+        if (vehicle.ownerEmployeeId == parkingLog.empId) {
             parkingLog.vehicleNumber = vehicle.vehicleNumber;
         }
     });
@@ -282,8 +312,7 @@ function validateAddition(items) {
         if (loc.ParkingLocations && loc.ParkingLocations.length > 0) {
             loc.ParkingLocations.forEach($p => {
                 if ($p.LocationId == locationId) {
-                    if ($p.AvailableTwoWheelerCount == 0 && $p.AvailableFourWheelerCount == 0)
-                    {
+                    if ($p.AvailableTwoWheelerCount == 0 && $p.AvailableFourWheelerCount == 0) {
                         $('#sec_empid').attr('disabled', 'disabled');
                         $('#sec_empName').attr('disabled', 'disabled');
                         $('#sec_vehicleNo').attr('disabled', 'disabled');
@@ -292,14 +321,13 @@ function validateAddition(items) {
                         $('#btnSaveParkingLog').attr('disabled', 'disabled');
                         $('#btnCancelParkingLog').attr('disabled', 'disabled');
                     }
-                    else if ($p.AvailableTwoWheelerCount == 0 && $p.AvailableFourWheelerCount>0)
-                    {
+                    else if ($p.AvailableTwoWheelerCount == 0 && $p.AvailableFourWheelerCount > 0) {
                         $('#sec_vehicleType').find('option[value=0]').remove();
                     }
                     else if ($p.AvailableTwoWheelerCount > 0 && $p.AvailableFourWheelerCount == 0) {
                         $('#sec_vehicleType').find('option[value=1]').remove();
                     }
-                    else{
+                    else {
                         $('#sec_empid').removeAttr('disabled');
                         $('#sec_empName').removeAttr('disabled');
                         $('#sec_vehicleNo').removeAttr('disabled');
@@ -320,17 +348,60 @@ function validateAddition(items) {
     return false;
 }
 
-function autoPopulateDetails(vehicleStr)
-{
-    const contextVehicleDetails=JSON.parse(vehicleStr);
+function autoPopulateDetails(vehicleStr) {
+    const contextVehicleDetails = JSON.parse(vehicleStr);
     const inputKey = $("#sec_vehicleNo").val();
-    contextVehicleDetails.forEach(vehicle=>{
-        if (vehicle.vehicleNumber.indexOf(inputKey)>-1)
-        {
+    if (inputKey.trim() == "") {
+        $('#sec_empid').val(null);
+        $('#sec_empName').val(null);
+        $('#sec_vehicleType').val(0);
+        return;
+    }
+    contextVehicleDetails.forEach(vehicle => {
+        if (vehicle.vehicleNumber.indexOf(inputKey) > -1) {
             $('#sec_empid').val(vehicle.ownerEmployeeId);
             $('#sec_empName').val(vehicle.ownerName);
             $('#sec_vehicleType').val(vehicle.vehicleType);
         }
     });
 
+}
+
+function submitReservationRequest() {
+    let request = {};
+    request.locationId = $("#parking_location_ddl_res").val();
+    request.empName = $("#res_empName").val();
+    request.vehicleType = $("#res_vehicleType").val();
+    request.vehicleCount = $("#res_vehicleCount").val();
+    request.reservationDate = $("#res_date").val();
+    $.ajax({
+        type: "POST",
+        url: `/parking/submitReservation`,
+        cache: false,
+        data: request,
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("Adding details...");
+        },
+        success: function (data) {
+            if (data && (data.statusCode == 401 || data.statusCode == 402)) {
+                showErrorToast(data.message);
+            }
+            else {
+                showSuccessToast(data.message);
+            }
+            resetReservationForm();
+
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
+}
+
+function resetReservationForm() {
+    $("#res_empName").val(null);
+    $("#res_vehicleType").val(0);
+    $("#res_vehicleCount").val(null);
+    $("#res_date").val(null);
 }

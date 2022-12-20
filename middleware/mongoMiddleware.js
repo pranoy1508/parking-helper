@@ -174,3 +174,32 @@ module.exports.GetVehicleInformationByName = async (userName) => {
     }
     return vehicleDetails;
 }
+
+module.exports.CreateParkingReservation = async (payload) => {
+    let reservationLog = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        reservationLog = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).insert(payload);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return reservationLog;
+}
+
+module.exports.GetParkingRequestsByUserName = async (userName,_limit) => {
+    let reservationLog = null;
+    try {
+        const query = { "requestedBy": userName };
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        reservationLog = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).find(query).limit(_limit).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return reservationLog;
+}

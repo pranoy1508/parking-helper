@@ -24,7 +24,9 @@
 .theme-indigo .metismenu a:focus
  {
 	background: -webkit-gradient(linear, left top, right top, from(#1e077a), to(#a76cfd));
-    background: linear-gradient(to right, #1e077a, #a76cfd);
+    background: linear-gradient(to right,
+        #07357a,
+        #fdeb6c);
     border: 0;
     -webkit-transition: opacity 0.3s ease;
     transition: opacity 0.3s ease;
