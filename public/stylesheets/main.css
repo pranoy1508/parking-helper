@@ -67,7 +67,9 @@ table.table-bordered.dataTable th{
 
 .theme-indigo .custom-navbar {
     background-color: #7f53ac;
-    background-image: linear-gradient(315deg, #021a91 40%, #e6ee64 60%);
+    background-image: linear-gradient(315deg,
+        #19b5c5 40%,
+        #e6ee64 60%);
     height: 60px;
 }
 
