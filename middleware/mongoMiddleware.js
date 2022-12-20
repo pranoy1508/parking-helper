@@ -137,7 +137,6 @@ module.exports.GetVehicleCountByType = async (_vehicleType, _locationId, startDa
                 $lte: new Date(endDate)
             }
         };
-        var res = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).find(query).toArray();
         vehicleCount = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).countDocuments(query);
         dbConnection.close();
     }
