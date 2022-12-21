@@ -1,9 +1,10 @@
+const _ = require("lodash");
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
-const ParkingLogs = require("../models/parkingLogs");
 const ReservationRequest = require("../models/reservationRequest");
-const _=require("lodash");
-
+const emailMiddleware=require("../middleware/emailMiddleware");
+const UserModel = require("../models/user.js");
+const emailTemplates=require("../templates/approvalEmailTemplate.json");
 
 
 const onLoad = asyncHandler(async (req, res) => {
@@ -107,6 +108,14 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
 
         const reservationRequest = new ReservationRequest(reservationReq.locationId, reservationReq.empName, reservationReq.vehicleType, reservationReq.vehicleCount, reservationReq.reservationDate, new Date(), req.session.users_id.userName);
         const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
+        if (reservationLogResponse)
+        {
+            const adminDetails = await UserModel.find({ userRole: "ADMIN" });
+            const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
+            const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date',reservationReq.reservationDate);
+            let emailBody = emailTemplates.find(x => x.emailType == "reservationApproval").template.replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
+            await emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
+        }
         res.json({
             statusCode: 201,
             message: `Successfully submitted the reservation request for ${reservationReq.reservationDate}`

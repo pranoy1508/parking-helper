@@ -1,0 +1,6 @@
+[
+    {
+        "emailType": "reservationApproval",
+        "template": "'<h3>Hello Admin,</h3><br/><p>You have a decision to make.</p><p> A new parking reservation request has been made by <b style='color: blue;'>$requestor</b> for <b style='color: blue;'>$date</b></p><br/><br/><p>Kindly <b>Approve</b> or <b>Reject</b> the same by clicking <a href='http://localhost:3033/'>here</a></p><br><p><span style='font-size: larger;color: blue;'>Office : </span><span style='font-size: larger;color: red;'>$office</span></p><p><span style='font-size: larger;color: blue;'>Location : </span><span style='font-size: larger;color: red;'>$location</span></p><br/><br/><p style='color: burlywood;font-weight: bold;'>Regards,</p><p style='color: rebeccapurple;font-weight: bold;'>Park Whiz Team</p>'"
+    }
+]

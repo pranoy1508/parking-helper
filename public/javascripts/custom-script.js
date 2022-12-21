@@ -372,6 +372,8 @@ function submitReservationRequest() {
     request.vehicleType = $("#res_vehicleType").val();
     request.vehicleCount = $("#res_vehicleCount").val();
     request.reservationDate = $("#res_date").val();
+    request.officeLocation = $("#location_ddl_res").val();
+    request.location = $("#parking_location_ddl_res option:selected").text().trim();
     $.ajax({
         type: "POST",
         url: `/parking/submitReservation`,
