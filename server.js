@@ -41,7 +41,6 @@ app.use(
     }),
   })
 );
-app.use('/public/images/', express.static('./public/images'));
 app.use("/", indexRouter);
 const PORT = process.env.PORT || 3033;
 app.listen(
