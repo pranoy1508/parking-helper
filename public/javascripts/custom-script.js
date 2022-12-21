@@ -189,9 +189,7 @@ function saveUser() {
             }
             else {
                 showSuccessToast(data.message);
-                setTimeout(function () {
-                    location.reload();
-                }, 3000);
+                location.reload();
             }
         },
         error: function () {
@@ -289,7 +287,7 @@ function saveParkingLog(vehicleStr) {
             }
             else {
                 showSuccessToast(data.message);
-                resetParkingLog();
+                location.reload();
             }
         },
         error: function () {
@@ -389,9 +387,8 @@ function submitReservationRequest() {
             }
             else {
                 showSuccessToast(data.message);
+                location.reload();
             }
-            resetReservationForm();
-
         },
         error: function () {
             showErrorToast("Something went wrong. Please try again");

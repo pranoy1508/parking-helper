@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="Webpixels" />
+    <link rel="icon" href="/favicon.png" type="image/x-icon" />
+    <title>Park Whiz</title>
+
+    <link rel="stylesheet" href="/vendor/themify-icons/themify-icons.css" />
+    <link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/vendor/chartist/css/chartist.min.css" />
+    <!-- <link rel="stylesheet" href="/vendor/chartist-plugin-tooltip/chartist-plugin-tooltip.css"> -->
+    <link rel="stylesheet" href="/vendor/charts-c3/plugin.css" />
+    <link rel="stylesheet" href="/vendor/morrisjs/morris.css" />
+    <link rel="stylesheet" href="/vendor/jvectormap/jquery-jvectormap-2.0.3.css" />
+    <link rel="stylesheet" href="/vendor/fullcalendar/fullcalendar.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" href="/stylesheets/main.css" type="text/css" />
+    <link rel="stylesheet" href="/stylesheets/jquery.toast.css" type="text/css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.3/xlsx.full.min.js"></script>
+
+    <script>
+        let toggleEdit = (fieldName, index) => {
+            var x = document.getElementById(fieldName + '-label-' + index);
+            var y = document.getElementById(fieldName + '-input-' + index);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+                y.style.display = "none";
+            } else {
+                x.style.display = "none";
+                y.style.display = "block";
+            }
+        }
+
+        $(document).ready(function () {
+            $("#goDown").click(function () {
+                $("html, body").animate({
+                    scrollTop: $(
+                        'html, body').get(0).scrollHeight
+                }, 2000);
+            });
+            $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+                localStorage.setItem('activeTab_support', $(e.target).attr('href'));
+            });
+            var activeTab = localStorage.getItem('activeTab_support');
+            if (activeTab) {
+                $('#support_nav_tab a[href="' + activeTab + '"]').tab('show');
+            }
+        });
+    </script>
+
+    <style>
+        .error {
+            color: red;
+        }
+
+        @media screen and (max-width: 992px) {
+            .navbar-nav .nav-item {
+                margin-right: 3.5rem;
+            }
+        }
+
+        #goDown {
+            position: fixed;
+            /* Fixed/sticky position */
+            bottom: 20px;
+            /* Place the button at the bottom of the page */
+            left: 30px;
+            /* Place the button 30px from the right */
+            z-index: 99;
+            /* Make sure it does not overlap */
+        }
+    </style>
+</head>
+
+<body class="theme-indigo">
+    <!-- Page Loader -->
+    <!-- <div class="page-loader-wrapper">
+        <div class="loader">
+            <div class="m-t-30"><img src="/images/brand/icon_black.svg" width="48" height="48" alt="ArrOw"></div>
+            <p>Please wait...</p>
+        </div>
+    </div> -->
+    <nav class="navbar custom-navbar navbar-expand-lg py-2">
+        <img src="https://www.ltimindtree.com/wp-content/uploads/2022/10/LTIMindtree_Linear_2-1-LT-Blue-1-1.png"
+            alt="LTIMindtree" style="width: 12%; border-radius: 5px" />
+
+        <div class="container-fluid px-0" style="width: 90%">
+            <a href="javascript:void(0);" class="menu_toggle"><i class="fa fa-align-left"></i></a>
+            <div id="navbar_main">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link nav-link-icon" href="javascript:void(0);" id="navbar_1_dropdown_3"
+                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Hi <i class="fa fa-user pl-2"></i></a>
+                        <!-- ////////// -->
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <button class="dropdown-item" type="button" data-toggle="modal" data-target="#new-modal">
+                                <i class="fa fa-cog text-primary"></i>Change Password</a>
+                            </button>
+                            <a onclick="return confirm('Are you sure, you want to sign out?')" class="dropdown-item"
+                                href="/logout"><i class="fa fa-sign-out text-primary"></i>Sign out</a>
+                        </div>
+            </div>
+
+            <form method="post" autocomplete="off" id="change_password">
+                <div class="modal " style="z-index: 9;" id="new-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="new-modalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="new-modalLabel">
+                                    Change Password
+                                </h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-2 form-group">
+                                    <label class="font-weight-bold" for="">Old Password</label>
+                                    <input class="form-control" type="password" id="inputOldPWd"
+                                        placeholder="old password" name="input_old_password" />
+                                </div>
+                                <div class="mb-2 form-group">
+                                    <label class="font-weight-bold" for="">New Password</label>
+                                    <input class="form-control" type="password" id="inputNewPwd"
+                                        placeholder="new password" name="enter_new_password" />
+                                </div>
+                                <div class="mb-2 form-group">
+                                    <label class="font-weight-bold" for="">Re-enter password</label>
+                                    <input class="form-control" type="password" id="input"
+                                        placeholder="re-enter new password" name="re_enter_new_password" />
+                                </div>
+                            </div>
+
+
+
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Close
+                                </button>
+                                <button type="submit" class="btn btn-primary changePassword">
+                                    change Password
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+
+            </form>
+            /////
+
+            <div class="dropdown-divider" role="presentation"></div>
+
+        </div>
+        </li>
+        </ul>
+
+        </div>
+        </div>
+    </nav>
+
+    <div class="main_content" id="main-content">
+        <!-- main-content  -->
+        <style>
+            .modal-backdrop.show {
+                z-index: 9 !important;
+            }
+        </style>

@@ -1,15 +1,15 @@
-<%- include('../header') %>
+<%- include('../header-user') %>
     <%- include('../left-sidebar') %>
 
         <form method="post" autocomplete="off" id="security_index">
             <div class="page">
                 <div class="container-fluid">
                     <!-- Tabs Navigations -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item active "><a href="#configurationTab" role="tab" data-toggle="tab"
+                    <ul class="nav nav-tabs" role="tablist" id="user_nav_tab">
+                        <li class="nav-item active "><a href="#parkingInfoTab" role="tab" data-toggle="tab"
                                 class="nav-link active fa-sharp fa-solid fa-table-columns"> Parking Info</a>
                         </li>
-                        <li class="nav-item"><a href="#UsersTab" role="tab" data-toggle="tab" class="nav-link fa-sharp fa-solid fa-car"> Register Vehicle</a>
+                        <li class="nav-item"><a href="#registerVehicleTab" role="tab" data-toggle="tab" class="nav-link fa-sharp fa-solid fa-car"> Register Vehicle</a>
                         </li>
                     </ul>
                     <!-- Tabs Navigations -->
@@ -17,10 +17,10 @@
                     <!-- Tabs content -->
                     
                     <div class="tab-content">
-                        <div class="tab-pane container active" id="configurationTab">
+                        <div class="tab-pane container active" id="parkingInfoTab">
                             <%- include('partials/_dashboardPartial.ejs') %>
                         </div>
-                        <div class="tab-pane container fade" id="UsersTab">
+                        <div class="tab-pane container fade" id="registerVehicleTab">
                             <%- include('partials/_registerPartial.ejs') %>
                         </div>
                     </div>

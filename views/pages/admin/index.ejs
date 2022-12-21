@@ -1,12 +1,12 @@
-<%- include('../header') %>
+<%- include('../header-admin') %>
     <%- include('../left-sidebar') %>
 
         <form method="post" autocomplete="off" id="admin_index">
             <div class="page">
                 <div class="container-fluid">
                     <!-- Tabs Navigations -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item active "><a href="#configurationTab" role="tab" data-toggle="tab"
+                    <ul class="nav nav-tabs" role="tablist" id="adminNavTab">
+                        <li class="nav-item active"><a href="#configurationTab" role="tab" data-toggle="tab"
                                 class="nav-link active fa fa-cog"> Configuration</a>
                         </li>
                         <li class="nav-item"><a href="#UsersTab" role="tab" data-toggle="tab"
@@ -26,8 +26,8 @@
                         <div class="tab-pane container fade" id="UsersTab">
                             <%- include('partials/_userPartial.ejs')%>
                         </div>
-                        <div class="tab-pane container fade" id="WorklistsTab">MySQL is a databased mostly used for web
-                            applications.
+                        <div class="tab-pane container fade" id="WorklistsTab">
+                            <%- include('partials/_workList.ejs')%>
                         </div>
                     </div>
                 </div>

@@ -1,14 +1,32 @@
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
 const ParkingDetails=require("../models/parkingDetails");
+const _=require("lodash");
 
 const onLoad = asyncHandler(async (req, res) => {
     const officeDetails = await mongoMiddleware.GetAllOfficeLocations();
     const userDetails=await mongoMiddleware.GetAllUsers();
+    let workLists=await mongoMiddleware.GetPendingParkingRequests(5);
     officeDetails.unshift("-- Please Select --");
     let loadDetails={};
     loadDetails.officeDetails = officeDetails;
     loadDetails.userDetails = userDetails;
+    const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
+    for (let res of workLists) {
+        const linkedOffice = _.find(fullDetails, (office) => {
+            if (office.ParkingLocations) {
+                const contextParking = _.find(office.ParkingLocations, ($p) => {
+                    if ($p.LocationId == res.locationId) {
+                        res.parkingLocation = $p.LocationName;
+                        return true;
+                    }
+                });
+                return contextParking;
+            }
+        });
+        res.officeLocation = linkedOffice ? linkedOffice.OfficeLocation : null;
+    }
+    loadDetails.workLists = workLists;
     res.render("pages/admin/index", {
         items: loadDetails,
         groupName: "admin"
@@ -47,7 +65,5 @@ const updateLocationDetails = asyncHandler(async (req, res) => {
     }
     return res.json({statusCode:200,message:"Updated Successfully"});
 });
-
-
 
 module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails };

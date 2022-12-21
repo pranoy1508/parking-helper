@@ -52,6 +52,13 @@
             'html, body').get(0).scrollHeight
         }, 2000);
       });
+      $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+        localStorage.setItem('activeTab_admin', $(e.target).attr('href'));
+      });
+      var activeTab = localStorage.getItem('activeTab_admin');
+      if (activeTab) {
+        $('#adminNavTab a[href="' + activeTab + '"]').tab('show');
+      }
     });
   </script>
 
