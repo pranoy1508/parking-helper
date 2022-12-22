@@ -46,6 +46,7 @@
         }
 
         $(document).ready(function () {
+            $("#parkingInfoDate").val(new Date().toISOString().split("T")[0]);
             $("#goDown").click(function () {
                 $("html, body").animate({
                     scrollTop: $(

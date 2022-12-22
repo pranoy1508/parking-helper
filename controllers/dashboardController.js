@@ -32,4 +32,18 @@ const onLoad = asyncHandler(async (req, res) => {
         groupName: "users"
     });
 });
-module.exports = { onLoad };
+
+const checkAvailability = asyncHandler(async (req, res) => {
+    const payload = req.body;
+    const startDate = `${payload.requestedData}T00:00:00`;
+    const endDate = `${payload.requestedData}T23:59:59`;
+    let locationDetails = await mongoMiddleware.GetParkingDetails(payload.locationId);
+    locationDetails.BookedFourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, payload.locationId, startDate, endDate);
+    locationDetails.BookedTwoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, payload.locationId, startDate, endDate);
+    locationDetails.TotalFourWheelerCount = locationDetails.NoOfFourWheelerParking;
+    locationDetails.TotalTwoWheelerCount = locationDetails.NoOfTwoWheelerParking;
+    
+    res.json(locationDetails);
+
+});
+module.exports = { onLoad, checkAvailability };

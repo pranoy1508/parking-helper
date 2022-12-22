@@ -34,6 +34,12 @@
                                     <%})%>
                             </select></td>
                     </tr>
+                    <tr>
+                        <td style="font-size: 20px;font-weight: bold;">Select a Date :
+                        </td>
+                        <td><input type="date" id="parkingInfoDate" style="width: 100%;" onchange="availableParkingLocationChanged('<%= JSON.stringify(items.officeDetails)  %>')"></input>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <br />
