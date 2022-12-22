@@ -196,7 +196,7 @@ module.exports.GetParkingRequestsByUserName = async (userName, _limit) => {
         const query = { "requestedBy": userName };
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        const sort = { reservationDate: -1 };
+        const sort = { reservationDate: 1 };
         reservationLog = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).find(query).limit(_limit).sort(sort).toArray();
         dbConnection.close();
     }
