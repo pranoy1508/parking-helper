@@ -27,6 +27,7 @@ const onLoad = asyncHandler(async (req, res) => {
         res.officeLocation = linkedOffice ? linkedOffice.OfficeLocation : null;
     }
     loadDetails.workLists = workLists;
+    loadDetails.userRole = req.session.users_id.userRole;
     res.render("pages/admin/index", {
         items: loadDetails,
         groupName: "admin"

@@ -26,6 +26,7 @@ const onLoad = asyncHandler(async (req, res) => {
     let returnResponse = {};
     returnResponse.vehicleInfo = vehicleInfo;
     returnResponse.officeDetails = officeDetails;
+    returnResponse.userRole = req.session.users_id.userRole;
     res.render("pages/users/index", {
         items: returnResponse,
         groupName: "users"

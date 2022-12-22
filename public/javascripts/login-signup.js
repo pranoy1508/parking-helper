@@ -33,7 +33,19 @@ if ($('#sign_in_form').length > 0) {
           if (data.status == 1) {
             showSuccessToast(data.message);
             setTimeout(function () {
-              window.location.href = "onLoad";
+              if (data.userRole=="SUPPORT"){
+                window.location.href ="openSecurity"
+              }
+              else if (data.userRole == "USER")
+              {
+                window.location.href = "dashboard"
+              }
+              else if (data.userRole == "ADMIN") {
+                window.location.href = "onLoad";
+              }
+              else{
+                window.location.href = "/"
+              }
             }, 1000);
           } else {
             showErrorToast(data.message);

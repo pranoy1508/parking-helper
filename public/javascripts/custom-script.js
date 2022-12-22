@@ -282,7 +282,7 @@ function saveParkingLog(vehicleStr) {
             showLoadingToast("Adding details...");
         },
         success: function (data) {
-            if (data.statusCode == 4021 || data.statusCode == 4022 || data.statusCode == 4023) {
+            if (data.statusCode == 4021 || data.statusCode == 4022 || data.statusCode == 4023 || data.statusCode==4044) {
                 showErrorToast(data.message);
             }
             else {

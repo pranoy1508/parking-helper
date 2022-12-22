@@ -21,6 +21,7 @@ exports.login_post = asyncHandler(async (req, res) => {
             req.session.users_id = result
             return res.json({
                 status: true,
+                userRole:result.userRole,
                 message: "Login Successful.",
             });
         } else {
