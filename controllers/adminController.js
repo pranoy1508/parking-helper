@@ -67,4 +67,21 @@ const updateLocationDetails = asyncHandler(async (req, res) => {
     return res.json({statusCode:200,message:"Updated Successfully"});
 });
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails };
+const executeReservation = asyncHandler(async(req,res)=>{
+    const payload=req.body;
+    let executionType="";
+    if (payload.requestType==0)
+    {
+        await mongoMiddleware.RejectParkingRequest(req.session.users_id.userName, payload.requestId);
+        executionType="Rejected";
+    }
+    else if (payload.requestType == 1)
+    {
+        //do nothing
+        executionType = "Accepted";
+    }
+    return res.json({ statusCode: 200, message: `${executionType} the request successfully` });
+    
+});
+
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation };

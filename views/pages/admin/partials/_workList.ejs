@@ -47,7 +47,7 @@
                             <button type="button" class="btn btn-success">Approve</button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger">Reject</button>
+                            <button type="button" class="btn btn-danger" onclick="executeReservation('<%= JSON.stringify(res._id)  %>',0)">Reject</button>
                         </td>
                     </tr>
                     <%})} else { %>

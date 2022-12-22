@@ -1,4 +1,5 @@
 const mongoClient = require("mongodb").MongoClient;
+const ObjectId = require("mongodb").ObjectId;
 
 module.exports.GetAllOfficeLocations = async () => {
     let officeLocationDetails = null;
@@ -97,7 +98,7 @@ module.exports.GetAllUsers = async () => {
     return userDetails;
 }
 
-module.exports.CreateParkingLog=async(payload)=>{
+module.exports.CreateParkingLog = async (payload) => {
     let parkingLogResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -146,7 +147,7 @@ module.exports.GetVehicleCountByType = async (_vehicleType, _locationId, startDa
     return vehicleCount;
 }
 
-module.exports.GetAllVehicleInformation=async()=>{
+module.exports.GetAllVehicleInformation = async () => {
     let vehicleDetails = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -189,13 +190,13 @@ module.exports.CreateParkingReservation = async (payload) => {
     return reservationLog;
 }
 
-module.exports.GetParkingRequestsByUserName = async (userName,_limit) => {
+module.exports.GetParkingRequestsByUserName = async (userName, _limit) => {
     let reservationLog = null;
     try {
         const query = { "requestedBy": userName };
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        const sort = {reservationDate:-1};
+        const sort = { reservationDate: -1 };
         reservationLog = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).find(query).limit(_limit).sort(sort).toArray();
         dbConnection.close();
     }
@@ -219,4 +220,27 @@ module.exports.GetPendingParkingRequests = async (_limit) => {
         console.log(exception);
     }
     return reservationLog;
+}
+
+module.exports.RejectParkingRequest = async (userName, requestId) => {
+    let rejectionResult = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        rejectionResult = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).updateOne(
+            { "_id": new ObjectId(requestId) },
+            {
+                $set: {
+                    "approvedBy": userName,
+                    "status":"REJECTED",
+                    "modifiedDate":new Date()
+                }
+            }
+        );
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return rejectionResult;
 }

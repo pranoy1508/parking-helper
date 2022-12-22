@@ -282,7 +282,7 @@ function saveParkingLog(vehicleStr) {
             showLoadingToast("Adding details...");
         },
         success: function (data) {
-            if (data.statusCode == 4021 || data.statusCode == 4022 || data.statusCode == 4023 || data.statusCode==4044) {
+            if (data.statusCode == 4021 || data.statusCode == 4022 || data.statusCode == 4023 || data.statusCode == 4044) {
                 showErrorToast(data.message);
             }
             else {
@@ -412,8 +412,29 @@ function bindReservationData(reservationLogStr) {
     $("#modTxtOffice").val(reservationLog.officeLocation);
     $("#modTxtParkingLoc").val(reservationLog.parkingLocation);
     $("#modTxtCreatedDate").val(reservationLog.createdDate.split("T")[0]);
-    $("#modTxtVehicleType").val(reservationLog.vehicleType==0?"2 Wheeler":"4 Wheeler");
+    $("#modTxtVehicleType").val(reservationLog.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler");
     $("#modTxtVehicleCount").val(reservationLog.vehicleCount);
     $("#modTxtGuestName").val(reservationLog.employeeName);
     $("#modTxtRequestedBy").val(reservationLog.requestedBy);
+}
+
+
+function executeReservation(requestIdStr, executionType) {
+    $.ajax({
+        type: "POST",
+        url: `/admin/executeReservation`,
+        cache: false,
+        data: { "requestType": executionType, "requestId": JSON.parse(requestIdStr) },
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("In Progress...");
+        },
+        success: function (data) {
+            showSuccessToast(data.message);
+            location.reload();
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
 }

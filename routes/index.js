@@ -27,5 +27,7 @@ router.post("/parking/create_parking_log", Auth, parkingController.addParkingLog
 router.post("/parking/submitReservation",Auth,parkingController.submitReservationRequest);
 router.post("/dashboard/get_availability", Auth, dashboardController.checkAvailability);
 
+router.post("/admin/executeReservation", Auth, adminController.executeReservation);
+
 
 module.exports = router; 
