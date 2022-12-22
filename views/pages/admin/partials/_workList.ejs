@@ -44,7 +44,7 @@
                                 data-target="#requestDetailsModal" onclick="bindReservationData('<%= JSON.stringify(res)  %>')">Details</button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-success">Approve</button>
+                            <button type="button" class="btn btn-success" onclick="executeReservation('<%= JSON.stringify(res._id)  %>',1)">Approve</button>
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger" onclick="executeReservation('<%= JSON.stringify(res._id)  %>',0)">Reject</button>

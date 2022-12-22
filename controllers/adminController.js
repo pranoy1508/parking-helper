@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
 const ParkingDetails=require("../models/parkingDetails");
+const ParkingLogs=require("../models/parkingLogs");
 const _=require("lodash");
 
 const onLoad = asyncHandler(async (req, res) => {
@@ -72,13 +73,41 @@ const executeReservation = asyncHandler(async(req,res)=>{
     let executionType="";
     if (payload.requestType==0)
     {
-        await mongoMiddleware.RejectParkingRequest(req.session.users_id.userName, payload.requestId);
+        await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId,"REJECTED");
         executionType="Rejected";
     }
     else if (payload.requestType == 1)
     {
-        //do nothing
         executionType = "Accepted";
+        const requestDetails = await mongoMiddleware.GetReservationDetailsById(payload.requestId);
+        if (requestDetails)
+        {
+            const locationDetails = await mongoMiddleware.GetParkingDetails(requestDetails.locationId);
+            const startDate = `${requestDetails.reservationDate}T00:00:00`;
+            const endDate = `${requestDetails.reservationDate}T23:59:59`;
+            const bookedCount = await mongoMiddleware.GetVehicleCountByType(requestDetails.vehicleType, requestDetails.locationId, startDate, endDate);
+            const totalCount = requestDetails.vehicleType == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
+            if (totalCount - bookedCount >= requestDetails.vehicleCount)
+            {
+                await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId, "ACCEPTED");
+                for (let idx = 1; idx <= requestDetails.vehicleCount;idx++)
+                {
+                    let parkingLog={};
+                    parkingLog.vehicleType = requestDetails.vehicleType;
+                    parkingLog.vehicleNumber="N/A";
+                    parkingLog.parkingLocation = requestDetails.locationId;
+                    parkingLog.linkedRfidCard=null;
+                    parkingLog.parkingDate = new Date(requestDetails.reservationDate);
+                    parkingLog.createdBy="Park Whiz";
+                    parkingLog.ownerName = requestDetails.employeeName && requestDetails.employeeName.trim() != "" ? requestDetails.employeeName:`Guest_${idx}`;
+                    parkingLog.ownerId="N/A";
+                    await ParkingLogs.create(parkingLog);
+                }
+            }
+            else{
+                res.json({ statusCode: 2022, message: `Requested parking spaces is more than available (${totalCount - bookedCount}) parking spaces.`})
+            }
+        }
     }
     return res.json({ statusCode: 200, message: `${executionType} the request successfully` });
     

@@ -222,7 +222,7 @@ module.exports.GetPendingParkingRequests = async (_limit) => {
     return reservationLog;
 }
 
-module.exports.RejectParkingRequest = async (userName, requestId) => {
+module.exports.UpdateParkingRequest = async (userName, requestId,status) => {
     let rejectionResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -232,7 +232,7 @@ module.exports.RejectParkingRequest = async (userName, requestId) => {
             {
                 $set: {
                     "approvedBy": userName,
-                    "status":"REJECTED",
+                    "status":status,
                     "modifiedDate":new Date()
                 }
             }
@@ -243,4 +243,19 @@ module.exports.RejectParkingRequest = async (userName, requestId) => {
         console.log(exception);
     }
     return rejectionResult;
+}
+
+
+module.exports.GetReservationDetailsById = async (requestId) => {
+    let reservationDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        reservationDetails = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).findOne({"_id":new ObjectId(requestId)});
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return reservationDetails;
 }

@@ -430,8 +430,14 @@ function executeReservation(requestIdStr, executionType) {
             showLoadingToast("In Progress...");
         },
         success: function (data) {
-            showSuccessToast(data.message);
-            location.reload();
+            if(data.statusCode==2022)
+            {
+                showErrorToast(data.message);
+            }
+            else{
+                showSuccessToast(data.message);
+                location.reload();
+            }
         },
         error: function () {
             showErrorToast("Something went wrong. Please try again");
