@@ -123,9 +123,9 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
         if (reservationLogResponse) {
             const adminDetails = await UserModel.find({ userRole: "ADMIN" });
             const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
-            const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate);
+            const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
             let emailBody = emailTemplates.find(x => x.emailType == "reservationApproval").template.replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
-            await emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
+            emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
         }
         res.json({
             statusCode: 201,

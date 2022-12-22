@@ -10,12 +10,12 @@
         <table id="user_tbl" class="table table-striped table-bordered" style="width:100%">
             <thead>
                 <tr class="font-weight-bold">
+                    <th>Request Id</th>
                     <th>Reservation Date</th>
                     <th>Office</th>
                     <th>Requested By</th>
                     <th>Count</th>
                     <th>Type</th>
-                    <th>Details</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -24,6 +24,10 @@
                 <% if(items.workLists && items.workLists.length>0){ items.workLists.forEach(function
                     (res){ %>
                     <tr>
+                        <td style="color: blue;">
+                            <a style="cursor: pointer;" data-toggle="modal" data-target="#requestDetailsModal" onclick="bindReservationData('<%= JSON.stringify(res)  %>')"> <%= res.uniqueId %></a>
+                            
+                        </td>
                         <td>
                             <%= res.reservationDate %>
                         </td>
@@ -38,10 +42,6 @@
                         </td>
                         <td>
                             <%= res.vehicleType==0 ? "2Wheeler" : "4Wheeler" %>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-primary" data-toggle="modal"
-                                data-target="#requestDetailsModal" onclick="bindReservationData('<%= JSON.stringify(res)  %>')">Details</button>
                         </td>
                         <td>
                             <button type="button" class="btn btn-success" onclick="executeReservation('<%= JSON.stringify(res._id)  %>',1)">Approve</button>
@@ -60,7 +60,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4>Details: </h4>
+                        <h4>Details for : <label id="lblRequestId"></label> </h4>
                     </div>
                     <div class="modal-body">
                         <table id="worklist_info_details" class="table table-striped table-bordered" style="width:100%">

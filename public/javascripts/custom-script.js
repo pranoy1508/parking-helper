@@ -416,6 +416,8 @@ function bindReservationData(reservationLogStr) {
     $("#modTxtVehicleCount").val(reservationLog.vehicleCount);
     $("#modTxtGuestName").val(reservationLog.employeeName);
     $("#modTxtRequestedBy").val(reservationLog.requestedBy);
+    $("#lblRequestId").empty();
+    $("#lblRequestId").text(reservationLog.uniqueId);
 }
 
 
