@@ -28,6 +28,6 @@ router.post("/parking/submitReservation",Auth,parkingController.submitReservatio
 router.post("/dashboard/get_availability", Auth, dashboardController.checkAvailability);
 
 router.post("/admin/executeReservation", Auth, adminController.executeReservation);
-
+router.get("/admin/exportParkingLogs", Auth, adminController.exportParkingLogs);
 
 module.exports = router; 

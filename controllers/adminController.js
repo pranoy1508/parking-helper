@@ -6,6 +6,7 @@ const _=require("lodash");
 const emailTemplates = require("../templates/approvalEmailTemplate.json");
 const emailMiddleware = require("../middleware/emailMiddleware");
 const UserModel = require("../models/user.js");
+const excelJs=require("exceljs");
 
 const onLoad = asyncHandler(async (req, res) => {
     const officeDetails = await mongoMiddleware.GetAllOfficeLocations();
@@ -135,10 +136,70 @@ const executeReservation = asyncHandler(async(req,res)=>{
 });
 
 
+const exportParkingLogs = asyncHandler(async (req, res) => {
+    const allParkingLists = await mongoMiddleware.GetAllParkingLogs(req.query.startDate, req.query.endDate);
+    const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const workbook = new excelJs.Workbook();
+    const worksheet = workbook.addWorksheet("ItemList");
+
+    worksheet.columns = [
+        { header: "Office Name", key: "office", width: 20 },
+        { header: "Parking Location", key: "parkingLocation", width: 20 },
+        { header: "Date", key: "reqDate", width: 20 },
+        { header: "Emp Id", key: "empId", width: 20 },
+        { header: "Emp Name", key: "empName", width: 20 },
+        { header: "Vehicle Type", key: "vehicleType", width: 20 },
+        { header: "Vehicle Number", key: "vehicleNumber", width: 20 },
+        { header: "RFID", key: "rfid", width: 20 },
+        { header: "In Time", key: "inTime", width: 50 }
+    ];
+    const itemCollection = await getExcelItemCollection(allParkingLists, officeDetails);
+    worksheet.addRows(itemCollection);
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + `Logs.xlsx`
+    );
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+    });
+});
+
 
 async function createEmailBody(stringBody, requestDetails,userName)
 {
     return stringBody.replace("$requestId", requestDetails.uniqueId).replace("$admin", userName).replace("$date", new Date().toISOString().split("T")[0]).replace("$office", requestDetails.officeName).replace("$location", requestDetails.parkingName).replace("$resDate", requestDetails.reservationDate).replace("$vType", requestDetails.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler").replace("$count", requestDetails.vehicleCount).replace("$requestorName", requestDetails.requestedBy);
 }
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation };
+async function getExcelItemCollection(allParkingLists, officeDetails)
+{
+    let excelData=[];
+    allParkingLists.forEach(p=>{
+        let item={};
+        item.reqDate = p.parkingDate.toISOString().split("T")[0];
+        item.empId = p.ownerName;
+        item.empName = p.ownerId;
+        item.vehicleType = p.vehicleType==0?"2 Wheeler":"4 Wheeler";
+        item.vehicleNumber = p.vehicleNumber;
+        item.rfid = p.linkedRfidCard;
+        item.inTime = p.parkingDate.toISOString().split("T")[1];
+        officeDetails.forEach(x => {
+            if (x.ParkingLocations) {
+                x.ParkingLocations.forEach(t => {
+                    if (t.LocationId == p.parkingLocation) {
+                        item.office = x.OfficeLocation;
+                        item.parkingLocation = t.LocationName;
+                    }
+                })
+            }
+        });
+        excelData.push(item);
+    });
+    return excelData;
+}
+
+
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs };

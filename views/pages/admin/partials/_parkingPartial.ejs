@@ -28,6 +28,9 @@
                 </tr>
             </thead>
         </table>
+        <a onClick="showExportDetails()" class="btn btn-success mx-1" name="btn_submit_export_details"
+            style="float: right;color: black;"><i class="fa-solid fa-download"></i>
+            &nbsp;Export Parking Data</a>
         <a onClick="getParkingDetails()" class="btn btn-success mx-1" name="btn_submit_get_details"
             style="float: right;color: black;"><i class="fa-solid fa-play"></i>
             &nbsp;Get Details</a>
@@ -60,6 +63,26 @@
                 </tr>
             </thead>
         </table>
+        </div>
+
+        <div id="details_div_date" class="d-none">
+            Select Date for Export :
+            <br /><br />
+            <table id="location_details_tbl" class="table table-striped table-bordered" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th style="font-size: 20px;">Select the start date : </th>
+                        <th><input type="date" class="form-control" id="dtStartDate"/></th>
+                    </tr>
+                    <tr>
+                        <th style="font-size: 20px;">Select the end date : </th>
+                        <th><input type="date" class="form-control" id="dtEndDate" /></th>
+                    </tr>
+                </thead>
+            </table>
+                    <a onClick="submitExport()" class="btn btn-primary mx-1" name="btn_submit_export_excel"
+                        style="float: right;color: black;"><i class="fa-solid fa-play"></i>
+                        &nbsp;Submit</a>
         </div>
     </div>
 </div>

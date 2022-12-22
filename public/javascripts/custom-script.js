@@ -98,6 +98,7 @@ function getParkingDetails() {
             showSuccessToast("Success");
             $('#lblLocation').text($("#parking_location_ddl option:selected").text());
             $('#details_div').removeClass("d-none");
+            $('#details_div_date').addClass("d-none");
             $('[name="txtTwoWheelerCount"]').val(data && data.NoOfTwoWheelerParking ? parseInt(data.NoOfTwoWheelerParking) : 0);
             $('[name="txtFourWheelerCount"]').val(data && data.NoOfFourWheelerParking ? parseInt(data.NoOfFourWheelerParking) : 0);
         },
@@ -445,4 +446,15 @@ function executeReservation(requestIdStr, executionType) {
             showErrorToast("Something went wrong. Please try again");
         },
     });
+}
+
+function showExportDetails()
+{
+    $('#details_div_date').removeClass("d-none");
+}
+
+function submitExport()
+{
+    const excelUrl = `/admin/exportParkingLogs?startDate=${$("#dtStartDate").val()}&endDate=${$("#dtEndDate").val()}`;
+    window.open(excelUrl);
 }

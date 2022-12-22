@@ -222,7 +222,7 @@ module.exports.GetPendingParkingRequests = async (_limit) => {
     return reservationLog;
 }
 
-module.exports.UpdateParkingRequest = async (userName, requestId,status) => {
+module.exports.UpdateParkingRequest = async (userName, requestId, status) => {
     let rejectionResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -232,8 +232,8 @@ module.exports.UpdateParkingRequest = async (userName, requestId,status) => {
             {
                 $set: {
                     "approvedBy": userName,
-                    "status":status,
-                    "modifiedDate":new Date()
+                    "status": status,
+                    "modifiedDate": new Date()
                 }
             }
         );
@@ -251,11 +251,34 @@ module.exports.GetReservationDetailsById = async (requestId) => {
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        reservationDetails = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).findOne({"_id":new ObjectId(requestId)});
+        reservationDetails = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).findOne({ "_id": new ObjectId(requestId) });
         dbConnection.close();
     }
     catch (exception) {
         console.log(exception);
     }
     return reservationDetails;
+}
+
+module.exports.GetAllParkingLogs = async (_startDate, _endDate) => {
+    var result = null;
+    try {
+        const startDate = `${_startDate}T00:00:00`;
+        const endDate = `${_endDate}T23:59:59`;
+        const query = {
+            parkingDate:
+            {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            }
+        };
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        result = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).find(query).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return result;
 }
