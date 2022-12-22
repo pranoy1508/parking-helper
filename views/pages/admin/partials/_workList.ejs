@@ -41,10 +41,10 @@
                         </td>
                         <td>
                             <button type="button" class="btn btn-primary" data-toggle="modal"
-                                data-target="#requestDetailsModal">Details</button>
+                                data-target="#requestDetailsModal" onclick="bindReservationData('<%= JSON.stringify(res)  %>')">Details</button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-success">Approve</button>                           
+                            <button type="button" class="btn btn-success">Approve</button>
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger">Reject</button>
@@ -64,9 +64,70 @@
                     </div>
                     <div class="modal-body">
                         <table id="worklist_info_details" class="table table-striped table-bordered" style="width:100%">
-                               <tr>
-                                <th></th>
-                               </tr>
+                            <tr>
+                                <th class="text-success">
+                                    Requested Date :
+                                </th>
+                                <th>
+                                    <input type="text" id="modTxtRequestedDate" disabled  class="text-success"/>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="text-success">
+                                    Office Location :
+                                </th>
+                                <th>
+                                    <input class="text-success" type="text" id="modTxtOffice" disabled />
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Parking Location :
+                                </th>
+                                <th>
+                                    <input type="text" id="modTxtParkingLoc" disabled/>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Requested By :
+                                </th>
+                                <th>
+                                    <input type="text" id="modTxtRequestedBy" disabled />
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Created Date :
+                                </th>
+                                <th>
+                                    <input type="text" id="modTxtCreatedDate" disabled />
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="text-danger">
+                                    Vehicle Type :
+                                </th>
+                                <th>
+                                    <input class="text-danger" type="text" id="modTxtVehicleType" disabled />
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="text-danger">
+                                    Vehicle Count :
+                                </th>
+                                <th>
+                                    <input class="text-danger" type="text" id="modTxtVehicleCount" disabled />
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Guest Name :
+                                </th>
+                                <th>
+                                    <input type="text" id="modTxtGuestName" disabled style="word-wrap: break-word;" />
+                                </th>
+                            </tr>
                         </table>
                     </div>
                     <div class="modal-footer">

@@ -404,3 +404,16 @@ function resetReservationForm() {
     $("#res_vehicleCount").val(null);
     $("#res_date").val(null);
 }
+
+
+function bindReservationData(reservationLogStr) {
+    const reservationLog = JSON.parse(reservationLogStr);
+    $("#modTxtRequestedDate").val(reservationLog.reservationDate);
+    $("#modTxtOffice").val(reservationLog.officeLocation);
+    $("#modTxtParkingLoc").val(reservationLog.parkingLocation);
+    $("#modTxtCreatedDate").val(reservationLog.createdDate.split("T")[0]);
+    $("#modTxtVehicleType").val(reservationLog.vehicleType==0?"2 Wheeler":"4 Wheeler");
+    $("#modTxtVehicleCount").val(reservationLog.vehicleCount);
+    $("#modTxtGuestName").val(reservationLog.employeeName);
+    $("#modTxtRequestedBy").val(reservationLog.requestedBy);
+}
