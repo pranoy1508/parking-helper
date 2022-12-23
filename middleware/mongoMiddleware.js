@@ -167,7 +167,7 @@ module.exports.GetVehicleInformationByName = async (userName) => {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
         const query = { "ownerName": userName };
-        vehicleDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).find(query).toArray();
+        vehicleDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).find(query).sort({vehicleType:1}).toArray();
         dbConnection.close();
     }
     catch (exception) {
