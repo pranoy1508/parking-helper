@@ -167,7 +167,7 @@ module.exports.GetVehicleInformationByName = async (userName) => {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
         const query = { "ownerName": userName };
-        vehicleDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).find(query).sort({vehicleType:1}).toArray();
+        vehicleDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).find(query).sort({ vehicleType: 1 }).toArray();
         dbConnection.close();
     }
     catch (exception) {
@@ -275,6 +275,33 @@ module.exports.GetAllParkingLogs = async (_startDate, _endDate) => {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
         result = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).find(query).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return result;
+}
+
+module.exports.RegisterVehicle = async (payload) => {
+    var result = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        const exitingDetails = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).findOne({ "ownerName": payload.ownerName, "vehicleType": payload.vehicleType });
+        if (exitingDetails) {
+            result = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).updateOne(
+                { "ownerName": payload.ownerName, "vehicleType": payload.vehicleType },
+                {
+                    $set: {
+                        vehicleNumber: payload.vehicleNumber
+                    }
+                }
+            );
+        }
+        else {
+            result = await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).insert(payload);
+        }
         dbConnection.close();
     }
     catch (exception) {

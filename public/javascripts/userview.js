@@ -73,3 +73,42 @@ function updateParkingInfoView(contextLocationDetails)
         $("#dtl_four_wheeler").html(getParkingInfoTemplate(contextLocationDetails, 1));
     }
 }
+
+
+function autoPopulateEmployeeId(item)
+{
+    $('[name="reg_empId_Two"]').val(item.value);
+    $('[name="reg_empId_Four"]').val(item.value);
+}
+function saveVehicleDetails()
+{
+    const userId = $('[name="reg_empId_Two"]').val();
+    const twoWheelerNo = $('[name="reg_vehicleNumber_Two"]').val();
+    const fourWheelerNo = $('[name="reg_vehicleNumber_Four"]').val();
+    let payload={};
+    payload.userId = $('[name="reg_empId_Two"]').val();
+    if (twoWheelerNo && twoWheelerNo.trim()!="")
+    {
+        payload.twoWheelerNo = twoWheelerNo;
+    }
+    if (fourWheelerNo && fourWheelerNo.trim() != "") {
+        payload.fourWheelerNo = fourWheelerNo;
+    }
+    $.ajax({
+        type: "POST",
+        url: `/dashboard/registerVehicle`,
+        cache: false,
+        data: payload,
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("Registering...");
+        },
+        success: function (data) {
+            showSuccessToast("Success");
+            location.reload();
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
+}

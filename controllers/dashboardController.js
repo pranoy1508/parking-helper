@@ -1,7 +1,13 @@
+const _ = require("lodash");
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
 const VehicleDetails = require("../models/vehicleDetails");
-const _=require("lodash");
+const emailMiddleware = require("../middleware/emailMiddleware");
+const emailTemplates = require("../templates/approvalEmailTemplate.json");
+
+
+
+
 const onLoad = asyncHandler(async (req, res) => {
     let vehicleInfo = await mongoMiddleware.GetVehicleInformationByName(req.session.users_id.userName);
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
@@ -10,16 +16,16 @@ const onLoad = asyncHandler(async (req, res) => {
     const endDate = `${sysDate}T23:59:59`;
     if (vehicleInfo.length == 0) {
         vehicleInfo = [];
-        vehicleInfo.push(new VehicleDetails(req.session.users_id.userName));
-        vehicleInfo.push(new VehicleDetails(req.session.users_id.userName));
+        vehicleInfo.push(new VehicleDetails(req.session.users_id.userName,null,0,null));
+        vehicleInfo.push(new VehicleDetails(req.session.users_id.userName, null, 1, null));
     }
     else if(vehicleInfo.length==1){
         switch (_.first(vehicleInfo.vehicleType)) {
             case 0:
-                vehicleInfo.push(new VehicleDetails(req.session.users_id.userName));
+                vehicleInfo.push(new VehicleDetails(req.session.users_id.userName, null, 1, null));
                 break;
                 case 1:
-                vehicleInfo.unshift(new VehicleDetails(req.session.users_id.userName));
+                vehicleInfo.unshift(new VehicleDetails(req.session.users_id.userName, null, 0, null));
                     break;
             default:
                 break;
@@ -59,4 +65,20 @@ const checkAvailability = asyncHandler(async (req, res) => {
     res.json(locationDetails);
 
 });
-module.exports = { onLoad, checkAvailability };
+
+const registerVehicle=asyncHandler(async(req,res)=>{
+    const payload=req.body;
+    if (payload.twoWheelerNo)
+    {
+        var vehicle = new VehicleDetails(req.session.users_id.userName, payload.userId, 0, payload.twoWheelerNo);
+        mongoMiddleware.RegisterVehicle(vehicle);
+    }
+    if (payload.fourWheelerNo) {
+        var vehicle = new VehicleDetails(req.session.users_id.userName, payload.userId, 1, payload.fourWheelerNo);
+        mongoMiddleware.RegisterVehicle(vehicle);
+    }
+    const emailSubject = process.env.VEHICLE_REGISTRATION_SUBJECT.replace('$user', req.session.users_id.userName);
+    emailMiddleware.TriggerEmail(req.session.users_id.userName, emailSubject, emailTemplates.find(x => x.emailType == "vehicleRegistration").template);
+    return res.json("Successfully registered the vehicle");
+});
+module.exports = { onLoad, checkAvailability, registerVehicle };

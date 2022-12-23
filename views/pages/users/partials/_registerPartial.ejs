@@ -18,19 +18,19 @@
                 <tbody>
                     <tr>
                         <td>
-                            <input type="email" class="form-control" name="reg_userName_Two"
+                            <input type="text" class="form-control" name="reg_userName_Two"
                                 placeholder="Enter the user Name" readonly value="<%= items.vehicleInfo[0].ownerName %>">
                         </td>
                         <td>
-                            <input type="email" class="form-control" name="reg_empId_Two"
-                                placeholder="Enter your Employee Id" value="<%= items.vehicleInfo[0].ownerEmployeeId %>">
+                            <input type="text" class="form-control" name="reg_empId_Two"
+                                placeholder="Enter your Employee Id" value="<%= items.vehicleInfo[0].ownerEmployeeId %>" onkeyup="autoPopulateEmployeeId(this)">
                         </td>
                         <td>
                             <input type="text" class="form-control" name="reg_vehicleNumber_Two"
                                 placeholder="Enter your vehicle number" value="<%= items.vehicleInfo[0].vehicleNumber %>">
                         </td>
                         <td>
-                            <select class="form-select form-control" name="add_user_role_Two"
+                            <select class="form-select form-control" name="add_vehicle_type_Two"
                                 aria-label="Default select example" disabled>
                                 <option value=0  <%= items.vehicleInfo[0].vehicleType ==0 ? 'selected' : '' %>>2Wheeler</option>
                             </select>
@@ -38,26 +38,26 @@
                     </tr>
                     <tr>
                         <td>
-                            <input type="email" class="form-control" name="reg_userName_Four" placeholder="Enter the user Name" readonly
+                            <input type="text" class="form-control" name="reg_userName_Four" placeholder="Enter the user Name" readonly
                                 value="<%= items.vehicleInfo[1].ownerName %>">
                         </td>
                         <td>
-                            <input type="email" class="form-control" name="reg_empId_Four_Four" placeholder="Enter your Employee Id"
-                                value="<%= items.vehicleInfo[1].ownerEmployeeId %>">
+                            <input type="text" class="form-control" name="reg_empId_Four" placeholder="Enter your Employee Id"
+                                value="<%= items.vehicleInfo[1].ownerEmployeeId %>" onkeyup="autoPopulateEmployeeId(this)">
                         </td>
                         <td>
                             <input type="text" class="form-control" name="reg_vehicleNumber_Four" placeholder="Enter your vehicle number"
                                 value="<%= items.vehicleInfo[1].vehicleNumber %>">
                         </td>
                         <td>
-                            <select class="form-select form-control" name="add_user_role_Four" aria-label="Default select example" disabled>
+                            <select class="form-select form-control" name="add_vehicle_type_Four" aria-label="Default select example" disabled>
                                 <option value=1 <%=items.vehicleInfo[1].vehicleType==1 ? 'selected' : '' %>>4Wheeler</option>
                             </select>
                         </td>
                     </tr>
                 </tbody>
             </table><br />
-            <button type="button" onclick="saveUser()" class="btn btn-primary" style="float: right;" name="btnSaveUser">Save</button>
+            <button type="button" onclick="saveVehicleDetails()" class="btn btn-primary" style="float: right;" name="btnSaveUser">Save</button>
         </div>
     </div>
 </div>

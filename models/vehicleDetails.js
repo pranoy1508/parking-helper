@@ -1,9 +1,9 @@
 class VehicleDetails {
-    constructor(userName) {
-        this.ownerEmployeeId = null;
+    constructor(userName,empId,vehicleType,vehicleNumber) {
+        this.ownerEmployeeId = empId;
         this.ownerName = userName;
-        this.vehicleType = 0;
-        this.vehicleNumber = null;
+        this.vehicleType = vehicleType;
+        this.vehicleNumber = vehicleNumber;
     }
 
 }

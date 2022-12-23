@@ -29,5 +29,6 @@ router.post("/dashboard/get_availability", Auth, dashboardController.checkAvaila
 
 router.post("/admin/executeReservation", Auth, adminController.executeReservation);
 router.get("/admin/exportParkingLogs", Auth, adminController.exportParkingLogs);
+router.post("/dashboard/registerVehicle", Auth, dashboardController.registerVehicle);
 
 module.exports = router; 
