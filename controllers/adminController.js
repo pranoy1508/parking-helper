@@ -140,7 +140,7 @@ const exportParkingLogs = asyncHandler(async (req, res) => {
     const allParkingLists = await mongoMiddleware.GetAllParkingLogs(req.query.startDate, req.query.endDate);
     const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     const workbook = new excelJs.Workbook();
-    const worksheet = workbook.addWorksheet("ItemList");
+    const worksheet = workbook.addWorksheet("ParkingLogs");
 
     worksheet.columns = [
         { header: "Office Name", key: "office", width: 20 },
