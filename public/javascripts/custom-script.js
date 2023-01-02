@@ -458,3 +458,69 @@ function submitExport()
     const excelUrl = `/admin/exportParkingLogs?startDate=${$("#dtStartDate").val()}&endDate=${$("#dtEndDate").val()}`;
     window.open(excelUrl);
 }
+
+
+function addUserFromExcel() {
+    var oFile = document.getElementsByName("input")[0].files[0];
+    var sFilename = oFile.name;
+    var reader = new FileReader();
+    var result = {};
+    reader.onload = function (e) {
+        var data = e.target.result;
+        data = new Uint8Array(data);
+        var workbook = XLSX.read(data, { type: 'array' });
+        var result = {};
+        workbook.SheetNames.forEach(function (sheetName) {
+            var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, defval: "" });
+            if (roa.length) result[sheetName] = roa;
+        });
+        if (result) {
+            var payLoad = {};
+            payLoad.temp = [];
+            for (var i = 1; i < result.ItemList.length; i++) {
+
+                if (result.ItemList[i].length > 0) {
+                    var tempIt = [];
+                    result.ItemList[i].forEach(x => {
+                        tempIt.push(x);
+                    });
+                }
+                payLoad.temp.push(tempIt);
+            }
+            console.log(payLoad);
+            $.ajax({
+                type: "POST",
+                method: "POST",
+                url: "/admin/add_excel_users",
+                data: { data: payLoad.temp, count: payLoad.temp.length },
+                dataType: "json",
+                cache: false,
+                beforeSend: function () {
+                    $(".addItemExcel").prop("disabled", true);
+                    $(".addItemExcel").html(
+                        '<i class="ace-icon fa fa-spinner fa-spin bigger-125"></i> Please wait...'
+                    );
+                },
+                success: function (data) {
+                    //$(".addItemExcel").html("Submit");
+                    $(".addItemExcel").prop("disabled", false);
+                    if (data.status == 1) {
+                        showSuccessToast(data.message);
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showErrorToast(data.message);
+                    }
+                },
+                error: function () {
+                    //$(".addItemExcel").html("Submit");
+                    $(".addItemExcel").prop("disabled", false);
+                    showErrorToast("Something went wrong. Please try again");
+                },
+            });
+
+        }
+    };
+    reader.readAsArrayBuffer(oFile);
+}

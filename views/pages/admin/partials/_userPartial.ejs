@@ -1,12 +1,49 @@
 <br />
 <br />
+<h1 class="commanHeading">Configure User Details :<b>
+    </b></h1>
 <div class="d-flex justify-content-between">
-    <h1 class="commanHeading">Configure User Details :<b>
-        </b></h1>
-    <button type="button" onclick="addUser()" class="btn btn-success fa fa-solid fa-plus" name="btnAddUser"> Add
-        User</button>
+    <div class="d-flex" style="flex-direction: row-reverse;">
+        <button type="button" style="float: right;" onclick="addUser()" class="btn btn-success" name="btnAddUser"><i
+                class="fa fa-solid fa-plus"></i> Add User</button>&nbsp;
+        <button type="button" style="float: right;" class="btn btn-primary" data-toggle="modal"
+            data-target="#exampleModal"><i class="fa-solid fa fa-file-arrow-up"></i> Import Users</button>&nbsp;
+        <button type="submit" style="float: right;" class="btn btn-info"><i class="fa-solid fa-file-arrow-down"></i>
+            Export Users List</button>
+    </div>
 </div>
+
+</button>
 <br />
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    Select Excel File
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="file" id="input" name="input" />
+            </div>
+            <div class="modal-footer">
+                <a href="/sample.xlsx" class="btn btn-primary">
+                    Sample Download
+                </a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
+                <button type="button" class="btn btn-primary addItemExcel" onclick="addUserFromExcel()">
+                    Add
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="card">
     <div class="body table-responsive">
         <table id="user_tbl" class="table table-striped table-bordered" style="width:100%">
@@ -28,8 +65,8 @@
                             </td>
                             <td><input type="text" class="form-control" value="<%= user.userName %>" name="userName"
                                     placeholder="User Name" readonly /></td>
-                            <td><input type="text" class="form-control" value="<%= user.userPassword %>"
-                                    name="password" placeholder="Password" readonly /></td>
+                            <td><input type="text" class="form-control" value="<%= user.userPassword %>" name="password"
+                                    placeholder="Password" readonly /></td>
                             <td><input type="text" class="form-control" value="<%= user.userRole %>" name="Role"
                                     placeholder="User Role" readonly /></td>
 
@@ -50,11 +87,12 @@
                 <tbody>
                     <tr>
                         <td>
-                            <input type="email" class="form-control" name="add_userName" placeholder="Enter the user Name">
+                            <input type="email" class="form-control" name="add_userName"
+                                placeholder="Enter the user Name">
                         </td>
                         <td>
-                            <input type="text" class="form-control" name="password" placeholder="Password will be auto-generated"
-                                readonly>
+                            <input type="text" class="form-control" name="password"
+                                placeholder="Password will be auto-generated" readonly>
                         </td>
                         <td>
                             <select class="form-select form-control" name="add_user_role"
@@ -68,7 +106,8 @@
                 </tbody>
             </table>
             <button type="button" onclick="saveUser()" class="btn btn-primary" name="btnSaveUser">Save</button>
-            <button type="button" onclick="cancelUserAddition()" class="btn btn-danger" style="float: right;" name="btnCancelUserAddition">Cancel</button>
+            <button type="button" onclick="cancelUserAddition()" class="btn btn-danger" style="float: right;"
+                name="btnCancelUserAddition">Cancel</button>
         </div>
     </div>
 </div>

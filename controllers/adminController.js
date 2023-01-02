@@ -8,6 +8,7 @@ const emailMiddleware = require("../middleware/emailMiddleware");
 const UserModel = require("../models/user.js");
 const excelJs=require("exceljs");
 const ReservationRequest = require("../models/reservationRequest");
+const passwordGen = require("generate-password");
 
 const onLoad = asyncHandler(async (req, res) => {
     const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
@@ -236,5 +237,6 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
     }
 
 });
+
 
 module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest };
