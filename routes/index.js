@@ -12,6 +12,8 @@ router.get("/", loginController.index);
 router.post("/login_post", loginController.login_post);
 router.get("/logout", loginController.logout);
 
+router.post("/change_password", Auth, loginController.changePassword);
+
 
 router.get("/onLoad", Auth, adminController.onLoad);
 router.post("/admin/get_parking_locations", Auth, adminController.getParkingLocationsByOffice);
