@@ -50,11 +50,11 @@ function getParkingInfoTemplate(item, typeOfVehicle) {
             htmlString += "<br/>";
         }
         else if (bookedTwoValue < bookedCount) {
-            htmlString += " <i class='fas fa-parking' style='font-size:48px;color:green'></i> ";
+            htmlString += " <i class='fas fa-parking' style='font-size:48px;color:red'></i> ";
             bookedTwoValue++;
         }
         else {
-            htmlString += " <i class='fas fa-parking' style='font-size:48px;color:#8080809c'></i> ";
+            htmlString += " <i class='fas fa-parking' style='font-size:48px;color:green'></i> ";
         }
     }
     return htmlString;

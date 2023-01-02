@@ -141,4 +141,29 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { onLoad, addParkingLogs, submitReservationRequest };
+const getAvailabilityView=asyncHandler(async(req,res)=>{
+    let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const sysDate = new Date().toISOString().split('T')[0];
+    const startDate = `${sysDate}T00:00:00`;
+    const endDate = `${sysDate}T23:59:59`;
+    for (let office of officeDetails) {
+        if (office.ParkingLocations) {
+            for (let parking of office.ParkingLocations) {
+                const twoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, startDate, endDate);
+                const fourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, startDate, endDate);
+                const locationIdDetails = await mongoMiddleware.GetParkingDetails(parking.LocationId);
+                parking.AvailableTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking - twoWheelerCount;
+                parking.AvailableFourWheelerCount = locationIdDetails.NoOfFourWheelerParking - fourWheelerCount;
+            }
+        }
+    };
+    let responseDetails = {};
+    responseDetails.officeDetails = officeDetails;
+    res.render("pages/security/partials/_freeViewPartial", {
+        items: responseDetails,
+        groupName: "security",
+        layout:false
+    });
+});
+
+module.exports = { onLoad, addParkingLogs, submitReservationRequest, getAvailabilityView };

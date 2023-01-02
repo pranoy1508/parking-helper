@@ -1,0 +1,23 @@
+<% items.officeDetails[0].ParkingLocations.forEach(function (details) { %>
+    <tr>
+        <th style="color:rgb(0, 0, 0)">
+            <%=details.LocationName %>
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+
+    </tr>
+    <tr class="blink_me" style="background-color:rgb(255,229,180)">
+        <td class="font-weight-bold" style="color:rgb(27, 6, 146);font-size: large;">Two Wheeler Space Available :</td>
+        <td class="font-weight-bold" style="color:darkgreen;font-size: large;">
+            <%= details.AvailableTwoWheelerCount %>
+        </td>
+        <td class="font-weight-bold" style="color:rgb(27, 6, 146);font-size: large;">Four Wheeler Space Available :</td>
+        <td class="font-weight-bold" style="color:darkgreen;font-size: large;">
+            <%= details.AvailableFourWheelerCount %>
+        </td>
+    </tr>
+
+
+    <%})%>
