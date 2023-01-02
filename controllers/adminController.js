@@ -7,17 +7,14 @@ const emailTemplates = require("../templates/approvalEmailTemplate.json");
 const emailMiddleware = require("../middleware/emailMiddleware");
 const UserModel = require("../models/user.js");
 const excelJs=require("exceljs");
+const ReservationRequest = require("../models/reservationRequest");
 
 const onLoad = asyncHandler(async (req, res) => {
+    const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
     const officeDetails = await mongoMiddleware.GetAllOfficeLocations();
     const userDetails=await mongoMiddleware.GetAllUsers();
-    let workLists=await mongoMiddleware.GetPendingParkingRequests(5);
-    officeDetails.unshift("-- Please Select --");
-    let loadDetails={};
-    loadDetails.officeDetails = officeDetails;
-    loadDetails.userDetails = userDetails;
-    const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
-    for (let res of workLists) {
+    let reservedDetails = await mongoMiddleware.GetReservationRequestByUserName(req.session.users_id.userName,5);
+    for (let res of reservedDetails) {
         const linkedOffice = _.find(fullDetails, (office) => {
             if (office.ParkingLocations) {
                 const contextParking = _.find(office.ParkingLocations, ($p) => {
@@ -31,8 +28,13 @@ const onLoad = asyncHandler(async (req, res) => {
         });
         res.officeLocation = linkedOffice ? linkedOffice.OfficeLocation : null;
     }
-    loadDetails.workLists = workLists;
+    officeDetails.unshift("-- Please Select --");
+    let loadDetails={};
+    loadDetails.officeDetails = officeDetails;
+    loadDetails.userDetails = userDetails;
+    loadDetails.reservedDetails = reservedDetails;
     loadDetails.userRole = req.session.users_id.userRole;
+    loadDetails.officeData = fullDetails;
     res.render("pages/admin/index", {
         items: loadDetails,
         groupName: "admin"
@@ -202,4 +204,37 @@ async function getExcelItemCollection(allParkingLists, officeDetails)
 }
 
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs };
+const submitReservationRequest = asyncHandler(async (req, res) => {
+    if (req.session.users_id.userRole == "ADMIN") {
+        const reservationReq = req.body;
+        if (new Date(reservationReq.reservationDate) < new Date()) {
+            res.json({
+                statusCode: 402,
+                message: `Operation Not Allowed for Past Dates`
+            });
+        }
+
+        const reservationRequest = new ReservationRequest(reservationReq.locationId, reservationReq.empName, reservationReq.vehicleType, reservationReq.vehicleCount, reservationReq.reservationDate, new Date(), req.session.users_id.userName);
+        const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
+        if (reservationLogResponse) {
+            const adminDetails = await UserModel.find({ userRole: "ADMIN" });
+            const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
+            const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
+            let emailBody = emailTemplates.find(x => x.emailType == "reservationApproval").template.replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
+            emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
+        }
+        res.json({
+            statusCode: 201,
+            message: `Successfully submitted the reservation request for ${reservationReq.reservationDate}`
+        });
+    }
+    else {
+        res.json({
+            statusCode: 401,
+            message: `Operation Not Allowed`
+        });
+    }
+
+});
+
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest };

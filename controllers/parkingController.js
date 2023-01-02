@@ -1,10 +1,7 @@
 const _ = require("lodash");
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
-const ReservationRequest = require("../models/reservationRequest");
-const emailMiddleware = require("../middleware/emailMiddleware");
-const UserModel = require("../models/user.js");
-const emailTemplates = require("../templates/approvalEmailTemplate.json");
+
 
 
 const onLoad = asyncHandler(async (req, res) => {
@@ -108,39 +105,6 @@ const addParkingLogs = asyncHandler(async (req, res) => {
 
 });
 
-const submitReservationRequest = asyncHandler(async (req, res) => {
-    if (req.session.users_id.userRole == "SUPPORT") {
-        const reservationReq = req.body;
-        if (new Date(reservationReq.reservationDate) < new Date()) {
-            res.json({
-                statusCode: 402,
-                message: `Operation Not Allowed for Past Dates`
-            });
-        }
-
-        const reservationRequest = new ReservationRequest(reservationReq.locationId, reservationReq.empName, reservationReq.vehicleType, reservationReq.vehicleCount, reservationReq.reservationDate, new Date(), req.session.users_id.userName);
-        const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
-        if (reservationLogResponse) {
-            const adminDetails = await UserModel.find({ userRole: "ADMIN" });
-            const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
-            const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
-            let emailBody = emailTemplates.find(x => x.emailType == "reservationApproval").template.replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
-            emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
-        }
-        res.json({
-            statusCode: 201,
-            message: `Successfully submitted the reservation request for ${reservationReq.reservationDate}`
-        });
-    }
-    else {
-        res.json({
-            statusCode: 401,
-            message: `Operation Not Allowed`
-        });
-    }
-
-});
-
 const getAvailabilityView=asyncHandler(async(req,res)=>{
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     const sysDate = new Date().toISOString().split('T')[0];
@@ -166,4 +130,4 @@ const getAvailabilityView=asyncHandler(async(req,res)=>{
     });
 });
 
-module.exports = { onLoad, addParkingLogs, submitReservationRequest, getAvailabilityView };
+module.exports = { onLoad, addParkingLogs, getAvailabilityView };

@@ -4,51 +4,53 @@
     <div class="body table-responsive">
         <div class="container">
             <h5>
-                Your Reservations Requests (Top 5) :
+                Your Booked Reservations Requests (Top 5) :
             </h5>
             <table class="table table-striped table-bordered" style="width:100%">
                 <thead style="font-weight: bold;">
+                    <td>Reservation Id</td>
+                    <td>Name</td>
                     <td>Reservation Date</td>
-                    <td>Office Location</td>
+                    <!-- <td>Office Location</td> -->
                     <td>Parking Location</td>
-                    <td>Vehicle Count</td>
+                    <!-- <td>Vehicle Count</td> -->
                     <td>Vehicle Type</td>
                     <td>Status</td>
+                    <td>Action</td>
                 </thead>
                 <tbody>
-                    <% if(items.reservations && items.reservations.length>0){ items.reservations.forEach(function
+                    <% if(items.reservedDetails && (items.reservedDetails).length>0){ items.reservedDetails.forEach(function
                         (res){ %>
                         <tr>
+                            <td class="font-weight-bold">
+                                <%= res.uniqueId %>
+                            </td>
+                            <td class="font-weight-bold">
+                                <%= res.employeeName %>
+                            </td>
                             <td>
                                 <%= res.reservationDate %>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <%= res.officeLocation %>
-                            </td>
+                            </td> -->
                             <td>
                                 <%= res.parkingLocation %>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <%= res.vehicleCount %>
-                            </td>
+                            </td> -->
                             <td>
                                 <%= res.vehicleType==0 ? "2Wheeler" : "4Wheeler" %>
                             </td>
+                            <td style="color: darkgreen;">
+                                <%= res.status %>
+                            </td>
                             <td>
-                                <% if(res.status=="PENDING" ){%>
-                                    <span class="text-warning font-weight-bold">
-                                        <%= res.status %>
-                                    </span>
-                                    <% }else {%>
-                                        <span class="text-success font-weight-bold">
-                                            <%= res.status %>
-                                        </span>
-                                        <%} %>
+                                <button type="button" onclick="cancelReservation(<%= res.uniqueId  %>)"  class="btn btn-danger">Cancel</button>
                             </td>
                         </tr>
-                        <%})} else { %>
-                            <h5 style="color: brown;"> No reservation requests found.</h5>
-                            <% } %>
+                        <%})} %>
                 </tbody>
             </table>
             <br />
@@ -59,8 +61,8 @@
                         <th style="font-size: 20px;" class="text-primary">Select LTIMindtree Location : </th>
                         <th><select class="form-select form-control" id="location_ddl_res"
                                 aria-label="Default select example"
-                                onchange="locationSelectionUpdatedForRes(this,'<%= JSON.stringify(items.officeDetails)  %>')">
-                                <% items.officeDetails.forEach(function (location) { %>
+                                onchange="locationSelectionUpdatedForRes(this,'<%= JSON.stringify(items.officeData)  %>')">
+                                <% items.officeData.forEach(function (location) { %>
                                     <option value='<%= location.OfficeLocation %>'>
                                         <%= location.OfficeLocation %>
                                     </option>
@@ -72,8 +74,8 @@
                         </td>
                         <td><select class="form-select form-control" id="parking_location_ddl_res"
                                 aria-label="Default select example"
-                                onchange="parkingSelectionChangedForRes(this,'<%= JSON.stringify(items.officeDetails)  %>')">
-                                <% items.officeDetails[0].ParkingLocations.forEach(function (parking) { %>
+                                onchange="parkingSelectionChangedForRes(this,'<%= JSON.stringify(items.officeData)  %>')">
+                                <% items.officeData[0].ParkingLocations.forEach(function (parking) { %>
                                     <option value='<%= parking.LocationId %>'>
                                         <%= parking.LocationName %>
                                     </option>
@@ -99,7 +101,7 @@
                             <input type="text" class="form-control" id="res_empName" placeholder="Enter the Name">
                         </td>
                         <td>
-                            <input type="Number" class="form-control" id="res_vehicleCount" min=1 value=1>
+                            <input type="Number" class="form-control" id="res_vehicleCount" min=1 value=1 disabled>
                         </td>
                         <td>
                             <select class="form-select form-control" id="res_vehicleType"
@@ -110,7 +112,7 @@
                         </td>
                         <td>
                             <button type="button" onclick="submitReservationRequest()" id="btnResSubmit"
-                                class="btn btn-primary">Submit</button>
+                                class="btn btn-primary">Reserve</button>
                         </td>
                     </tr>
                 </tbody>

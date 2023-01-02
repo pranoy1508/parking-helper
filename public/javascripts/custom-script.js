@@ -377,7 +377,7 @@ function submitReservationRequest() {
     request.location = $("#parking_location_ddl_res option:selected").text().trim();
     $.ajax({
         type: "POST",
-        url: `/parking/submitReservation`,
+        url: `/admin/submitReservation`,
         cache: false,
         data: request,
         dataType: "json",
