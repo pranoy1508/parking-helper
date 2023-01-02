@@ -45,14 +45,17 @@
             <br />
             <div id="parkingInfo_div">
                 <table id="parking_avl_tbl" class="table table-striped table-bordered" style="width:100%">
-                    <tr>
+                    <tr class="<%= items.IsTwoWheelerRegistered==true || items.IsFourWheelerRegistered==true? 'd-none':'' %>">
+                        <td><h3 style="color: red;"> <i class="fa-sharp fa-solid fa-triangle-exclamation"></i> &nbsp;Please register your vehicle to see the availability.</h3></td>
+                    </tr>
+                    <tr class="<%= items.IsTwoWheelerRegistered==true? '':'d-none' %>">
                         <th>
                             <span class="text-danger" style="font-size: larger;">Total 2 Wheeler Parking : <input
                                     type="number" class="text-danger font-weight-bold" disabled id="totTwoLbl"
                                     value="<%= items.officeDetails[0].ParkingLocations[0].TotalTwoWheelerCount %>">
                                 </input>
                             </span>
-                            <span class="text-success" style="font-size: larger;;float: right;">Available
+                            <span class="text-success" style="font-size: larger;float: right;">Available
                                 2 Wheeler Parking: <input type="number" id="avlTwoLbl"
                                     class="text-success font-weight-bold" disabled value="<%=
                                     items.officeDetails[0].ParkingLocations[0].TotalTwoWheelerCount-items.officeDetails[0].ParkingLocations[0].BookedTwoWheelerCount
@@ -60,7 +63,7 @@
                             </span>
                         </th>
                     </tr>
-                    <tr>
+                    <tr class="<%= items.IsTwoWheelerRegistered==true? '':'d-none' %>">
                         <td style="text-align:center" id="dtl_two_wheeler">
                             <% let bookedValue=0;for (var i=0; i
                                 <=items.officeDetails[0].ParkingLocations[0].TotalTwoWheelerCount ; i++ ) { %>
@@ -78,7 +81,7 @@
                                                 <% } %>
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="<%= items.IsFourWheelerRegistered==true? '':'d-none' %>">
                         <th>
                             <span class="text-danger" style="font-size: larger;">Total 4 Wheeler Parking
                                 : <input type="number" class="text-danger font-weight-bold" disabled id="totFourLbl"
@@ -91,7 +94,7 @@
                             </span>
                         </th>
                     </tr>
-                    <tr>
+                    <tr class="<%= items.IsFourWheelerRegistered==true? '':'d-none' %>">
                         <td style="text-align:center" id="dtl_four_wheeler">
                             <% let bookedValueFour=0;for (var i=0; i <=items.officeDetails[0].ParkingLocations[0].TotalFourWheelerCount ; i++ ) { %>
                                 <% if (i%20==0) { %>

@@ -9,6 +9,7 @@ const emailTemplates = require("../templates/approvalEmailTemplate.json");
 
 
 const onLoad = asyncHandler(async (req, res) => {
+    let returnResponse = {};
     let vehicleInfo = await mongoMiddleware.GetVehicleInformationByName(req.session.users_id.userName);
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     const sysDate = new Date().toISOString().split('T')[0];
@@ -16,20 +17,31 @@ const onLoad = asyncHandler(async (req, res) => {
     const endDate = `${sysDate}T23:59:59`;
     if (vehicleInfo.length == 0) {
         vehicleInfo = [];
-        vehicleInfo.push(new VehicleDetails(req.session.users_id.userName,null,0,null));
+        vehicleInfo.push(new VehicleDetails(req.session.users_id.userName, null, 0, null));
         vehicleInfo.push(new VehicleDetails(req.session.users_id.userName, null, 1, null));
+        returnResponse.IsTwoWheelerRegistered = false;
+        returnResponse.IsFourWheelerRegistered = false;
     }
-    else if(vehicleInfo.length==1){
-        switch (_.first(vehicleInfo.vehicleType)) {
+    else if (vehicleInfo.length == 1) {
+        switch (_.first(vehicleInfo).vehicleType) {
             case 0:
                 vehicleInfo.push(new VehicleDetails(req.session.users_id.userName, null, 1, null));
+                returnResponse.IsTwoWheelerRegistered = true;
+                returnResponse.IsFourWheelerRegistered = false;
                 break;
-                case 1:
+            case 1:
                 vehicleInfo.unshift(new VehicleDetails(req.session.users_id.userName, null, 0, null));
-                    break;
+                returnResponse.IsTwoWheelerRegistered = false;
+                returnResponse.IsFourWheelerRegistered = true;
+                break;
             default:
                 break;
         }
+    }
+    else if(vehicleInfo.length==2)
+    {
+        returnResponse.IsTwoWheelerRegistered = vehicleInfo.filter(x => x.vehicleType==0).length>0;
+        returnResponse.IsFourWheelerRegistered = vehicleInfo.filter(x => x.vehicleType == 1).length > 0;
     }
     for (let office of officeDetails) {
         if (office.ParkingLocations) {
@@ -42,7 +54,6 @@ const onLoad = asyncHandler(async (req, res) => {
             }
         }
     }
-    let returnResponse = {};
     returnResponse.vehicleInfo = vehicleInfo;
     returnResponse.officeDetails = officeDetails;
     returnResponse.userRole = req.session.users_id.userRole;
@@ -61,15 +72,14 @@ const checkAvailability = asyncHandler(async (req, res) => {
     locationDetails.BookedTwoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, payload.locationId, startDate, endDate);
     locationDetails.TotalFourWheelerCount = locationDetails.NoOfFourWheelerParking;
     locationDetails.TotalTwoWheelerCount = locationDetails.NoOfTwoWheelerParking;
-    
+
     res.json(locationDetails);
 
 });
 
-const registerVehicle=asyncHandler(async(req,res)=>{
-    const payload=req.body;
-    if (payload.twoWheelerNo)
-    {
+const registerVehicle = asyncHandler(async (req, res) => {
+    const payload = req.body;
+    if (payload.twoWheelerNo) {
         var vehicle = new VehicleDetails(req.session.users_id.userName, payload.userId, 0, payload.twoWheelerNo);
         mongoMiddleware.RegisterVehicle(vehicle);
     }
