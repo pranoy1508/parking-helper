@@ -431,32 +431,6 @@ function bindReservationData(reservationLogStr) {
     $("#lblRequestId").text(reservationLog.uniqueId);
 }
 
-
-function executeReservation(requestIdStr, executionType) {
-    $.ajax({
-        type: "POST",
-        url: `/admin/executeReservation`,
-        cache: false,
-        data: { "requestType": executionType, "requestId": JSON.parse(requestIdStr) },
-        dataType: "json",
-        beforeSend: function () {
-            showLoadingToast("In Progress...");
-        },
-        success: function (data) {
-            if (data.statusCode == 2022) {
-                showErrorToast(data.message);
-            }
-            else {
-                showSuccessToast(data.message);
-                location.reload();
-            }
-        },
-        error: function () {
-            showErrorToast("Something went wrong. Please try again");
-        },
-    });
-}
-
 function showExportDetails() {
     $('#details_div_date').removeClass("d-none");
 }

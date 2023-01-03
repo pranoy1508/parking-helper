@@ -29,7 +29,6 @@ router.post("/parking/create_parking_log", Auth, parkingController.addParkingLog
 router.post("/admin/submitReservation", Auth, adminController.submitReservationRequest);
 router.post("/dashboard/get_availability", Auth, dashboardController.checkAvailability);
 
-router.post("/admin/executeReservation", Auth, adminController.executeReservation);
 router.get("/admin/exportParkingLogs", Auth, adminController.exportParkingLogs);
 router.post("/dashboard/registerVehicle", Auth, dashboardController.registerVehicle);
 

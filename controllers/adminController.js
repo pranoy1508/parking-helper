@@ -73,62 +73,6 @@ const updateLocationDetails = asyncHandler(async (req, res) => {
     return res.json({ statusCode: 200, message: "Updated Successfully" });
 });
 
-const executeReservation = asyncHandler(async (req, res) => {
-    const payload = req.body;
-    let executionType = "";
-    if (payload.requestType == 0) {
-        await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId, "REJECTED");
-        executionType = "Rejected";
-    }
-    else if (payload.requestType == 1) {
-        executionType = "Accepted";
-        let requestDetails = await mongoMiddleware.GetReservationDetailsById(payload.requestId);
-        if (requestDetails) {
-            const locationDetails = await mongoMiddleware.GetParkingDetails(requestDetails.locationId);
-            const startDate = `${requestDetails.reservationDate}T00:00:00`;
-            const endDate = `${requestDetails.reservationDate}T23:59:59`;
-            const bookedCount = await mongoMiddleware.GetVehicleCountByType(requestDetails.vehicleType, requestDetails.locationId, startDate, endDate);
-            const totalCount = requestDetails.vehicleType == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
-            if (totalCount - bookedCount >= requestDetails.vehicleCount) {
-                await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId, "ACCEPTED");
-                for (let idx = 1; idx <= requestDetails.vehicleCount; idx++) {
-                    let parkingLog = {};
-                    parkingLog.vehicleType = requestDetails.vehicleType;
-                    parkingLog.vehicleNumber = "N/A";
-                    parkingLog.parkingLocation = requestDetails.locationId;
-                    parkingLog.linkedRfidCard = null;
-                    parkingLog.parkingDate = new Date(requestDetails.reservationDate);
-                    parkingLog.createdBy = "Park Whiz";
-                    parkingLog.ownerName = requestDetails.employeeName && requestDetails.employeeName.trim() != "" ? requestDetails.employeeName : `Guest_${idx}`;
-                    parkingLog.ownerId = "N/A";
-                    await ParkingLogs.create(parkingLog);
-                }
-                const parkingDetails = await mongoMiddleware.GetFullOfficeLocations();
-                parkingDetails.forEach(x => {
-                    if (x.ParkingLocations) {
-                        x.ParkingLocations.forEach(p => {
-                            if (p.LocationId == requestDetails.locationId) {
-                                requestDetails.officeName = x.OfficeLocation;
-                                requestDetails.parkingName = p.LocationName;
-                            }
-                        })
-                    }
-                });
-                const adminDetails = await UserModel.find({ userRole: "ADMIN" });
-                const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
-                const emailSubject = process.env.APPROVED_EMAIL_SUBJECT.replace('$requestId', requestDetails.uniqueId).replace("$date", new Date().toISOString().split("T")[0]);
-                let emailBody = await createEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationApproved"), requestDetails, req.session.users_id.userName);
-                emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
-            }
-            else {
-                res.json({ statusCode: 2022, message: `Requested parking spaces is more than available (${totalCount - bookedCount}) parking spaces.` })
-            }
-        }
-    }
-    return res.json({ statusCode: 200, message: `${executionType} the request successfully` });
-
-});
-
 const exportParkingLogs = asyncHandler(async (req, res) => {
     const allParkingLists = await mongoMiddleware.GetAllParkingLogs(req.query.startDate, req.query.endDate);
     const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
@@ -178,8 +122,8 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
             if (reservationLogResponse) {
                 const adminDetails = await UserModel.find({ userRole: "ADMIN" });
                 const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
-                const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
-                const emailBody = await getReservationEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationApproval"), reservationReq, req.session.users_id.userName);
+                const emailSubject = process.env.RESERVATION_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
+                const emailBody = await getReservationEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationCreated"), reservationRequest, reservationReq);
                 emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
             }
             res.json({
@@ -236,20 +180,35 @@ const exportUserLogs = asyncHandler(async (req, res) => {
 const cancelParkingRequest=asyncHandler(async(req,res)=>{
     const {id} = req.body;
     const reservationRequestDetails=await mongoMiddleware.GetReservationDetailsById(id);
+    const officeDetailsList=await mongoMiddleware.GetFullOfficeLocations();
+    let officeObj={};
+    officeDetailsList.forEach(x=>{
+        if (x.ParkingLocations && x.ParkingLocations.length>0)
+        {
+            x.ParkingLocations.forEach(p=>{
+                if (p.LocationId == reservationRequestDetails.locationId)
+                {
+                    officeObj.officeLocation = x.OfficeLocation;
+                    officeObj.location = p.LocationName;
+                }
+            });
+        }
+    });
     const startDate = `${reservationRequestDetails.reservationDate}T00:00:00`;
     const endDate = `${reservationRequestDetails.reservationDate}T23:59:59`;
     await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, id,"CANCELLED");
     await mongoMiddleware.RemoveParkingDetails(reservationRequestDetails.employeeName, startDate,endDate, reservationRequestDetails.locationId);
+    const adminDetails = await UserModel.find({ userRole: "ADMIN" });
+    const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
+    const emailSubject = process.env.CANCELLED_EMAIL_SUBJECT.replace('$date', reservationRequestDetails.reservationDate).replace("$requestId", reservationRequestDetails.uniqueId);
+    const emailBody = await getReservationEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationCancelled"), reservationRequestDetails, officeObj);
+    emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
     res.json({
         statusCode: 200,
         message: `Request ${reservationRequestDetails.uniqueId} cancelled successfully.`
     });
 });
 
-
-async function createEmailBody(stringBody, requestDetails, userName) {
-    return stringBody.replace("$requestId", requestDetails.uniqueId).replace("$admin", userName).replace("$date", new Date().toISOString().split("T")[0]).replace("$office", requestDetails.officeName).replace("$location", requestDetails.parkingName).replace("$resDate", requestDetails.reservationDate).replace("$vType", requestDetails.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler").replace("$count", requestDetails.vehicleCount).replace("$requestorName", requestDetails.requestedBy);
-}
 
 async function getExcelItemCollection(allParkingLists, officeDetails) {
     let excelData = [];
@@ -310,12 +269,12 @@ async function createReservationParkingLog(reservationReq, userName) {
     return parkingLogged;
 }
 
-async function getReservationEmailBody(template, reservationRequest,userName) {
-    return template.replace('$date', reservationRequest.reservationDate).replace('$requestor', userName).replace('$office', reservationRequest.officeLocation).replace('$location', reservationRequest.location);
+async function getReservationEmailBody(template, reservationRequest, payload) {
+    return template.replace('$date', reservationRequest.createdDate).replace('$requestorName', reservationRequest.requestedBy).replace('$office', payload.officeLocation).replace('$location', payload.location).replace("$requestId", reservationRequest.uniqueId).replace("$resDate", reservationRequest.reservationDate).replace("$vType", reservationRequest.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler").replace("$count", reservationRequest.vehicleCount);
 }
 
 
 
 
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest, exportUserLogs, cancelParkingRequest };
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, exportParkingLogs, submitReservationRequest, exportUserLogs, cancelParkingRequest };

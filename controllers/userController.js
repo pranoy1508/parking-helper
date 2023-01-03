@@ -3,6 +3,7 @@ const mongoMiddleware = require("../middleware/mongoMiddleware");
 const UserModel = require("../models/user.js");
 const passwordGen = require("generate-password");
 const _ = require("lodash-contrib");
+const emailMiddleware=require("../middleware/emailMiddleware");
 
 const getAllUserDetails = asyncHandler(async (req, res) => {
     const userDetails = await mongoMiddleware.GetAllUsers();
@@ -95,6 +96,8 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
                 newUser.userPassword = $user.userPassword;
                 newUser.locationId = $user.locationId;
                 await UserModel.create(newUser);
+                const emailBody = await getEmailBodyForUserAddition(await emailMiddleware.GetEmailBodyTemplate("userAddition"),newUser);
+                emailMiddleware.TriggerEmail(newUser.userName, `Welcome to ParkWhiz`, emailBody);
             }
         }
 
@@ -115,6 +118,10 @@ async function getLocationId(locationName) {
     const locationDetails = await mongoMiddleware.GetFullOfficeLocations();
     const contextOffice = _.filter(locationDetails, ($loc) => { return $loc.OfficeLocation == locationName.trim() });
     return (contextOffice.length > 0 ? _.first(contextOffice).OfficeId : null);
+}
+
+async function getEmailBodyForUserAddition(template, newUser) {
+    return template.replace("$user", newUser.userName).replace("$pwd", newUser.userPassword);
 }
 
 
