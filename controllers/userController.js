@@ -63,8 +63,8 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
         try {
             if (_.includes(allowedUserDomain, row[0].split("@")[1].toUpperCase())) {
                 const existingUser = await UserModel.findOne({ userName: row[0] });
-                const _locationId = row[1] && row[1]=="SUPPORT"?await getLocationId(row[2]):null;
-                if (!existingUser || (existingUser && row[3]=="REMOVE")){
+                const _locationId = row[1] && row[1] == "SUPPORT" ? await getLocationId(row[2]) : null;
+                if (!existingUser || (existingUser && row[3] == "REMOVE")) {
                     let $user = {
                         userName: row[0],
                         userRole: row[1] ? row[1] : "USER",
@@ -85,7 +85,7 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
         }
     }
     if (usersList.length > 0) {
-        const addedUserList = _.filter(usersList,(x)=>{return x.action=="ADD"} );
+        const addedUserList = _.filter(usersList, (x) => { return x.action == "ADD" });
         const removedUserList = _.filter(usersList, (x) => { return x.action == "REMOVE" });
         if (addedUserList.length > 0) {
             for (const $user of addedUserList) {
@@ -98,8 +98,7 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
             }
         }
 
-        if (removedUserList.length>0)
-        {
+        if (removedUserList.length > 0) {
             for (const $user of removedUserList) {
                 await UserModel.deleteOne({ userName: $user.userName });
                 await mongoMiddleware.RemoveVehicleDetailsByUserName($user.userName);
@@ -112,11 +111,10 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
     }
 });
 
-async function getLocationId(locationName)
-{
+async function getLocationId(locationName) {
     const locationDetails = await mongoMiddleware.GetFullOfficeLocations();
-    const contextOffice = _.filter(locationDetails, ($loc) => { return $loc.OfficeLocation==locationName.trim() });
-    return (contextOffice.length > 0 ? _.first(contextOffice).OfficeId:null);
+    const contextOffice = _.filter(locationDetails, ($loc) => { return $loc.OfficeLocation == locationName.trim() });
+    return (contextOffice.length > 0 ? _.first(contextOffice).OfficeId : null);
 }
 
 
