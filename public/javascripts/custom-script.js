@@ -477,11 +477,11 @@ function addUserFromExcel() {
         if (result) {
             var payLoad = {};
             payLoad.temp = [];
-            for (var i = 1; i < result.ItemList.length; i++) {
+            for (var i = 1; i < result.UserLogs.length; i++) {
 
-                if (result.ItemList[i].length > 0) {
+                if (result.UserLogs[i].length > 0) {
                     var tempIt = [];
-                    result.ItemList[i].forEach(x => {
+                    result.UserLogs[i].forEach(x => {
                         tempIt.push(x);
                     });
                 }
@@ -523,4 +523,10 @@ function addUserFromExcel() {
         }
     };
     reader.readAsArrayBuffer(oFile);
+}
+
+
+function exportUserDetails() {
+    const excelUrl = `/admin/export_user_details`;
+    window.open(excelUrl);
 }

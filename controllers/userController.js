@@ -63,18 +63,18 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
         try {
             if (_.includes(allowedUserDomain, row[0].split("@")[1].toUpperCase())) {
                 const existingUser = await UserModel.findOne({ userName: row[0] });
-                const _locationId = row[1] && row[1] == "SUPPORT" ? await getLocationId(row[2]) : null;
-                if (!existingUser || (existingUser && row[3] == "REMOVE")) {
+                const _locationId = row[2] && row[2].toUpperCase() == "SUPPORT" ? await getLocationId(row[3]) : null;
+                if (!existingUser || (existingUser && row[4].toUpperCase() == "REMOVE")) {
                     let $user = {
                         userName: row[0],
-                        userRole: row[1] ? row[1] : "USER",
+                        userRole: row[2] ? row[2].toUpperCase() : "USER",
                         userPassword: passwordGen.generate({
                             length: 10,
                             numbers: true,
 
                         }),
                         locationId: _locationId,
-                        action: row[3] ? row[3] : "ADD"
+                        action: row[4] ? row[4].toUpperCase() : "ADD"
                     };
                     usersList.push($user);
                 }

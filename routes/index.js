@@ -36,5 +36,6 @@ router.post("/dashboard/registerVehicle", Auth, dashboardController.registerVehi
 router.get("/parking/getAvailability", Auth, parkingController.getAvailabilityView);
 
 router.post("/admin/add_excel_users", Auth, userController.addUsersViaExcel);
+router.get("/admin/export_user_details", Auth, adminController.exportUserLogs);
 
 module.exports = router; 

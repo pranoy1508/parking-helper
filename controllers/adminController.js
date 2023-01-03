@@ -200,8 +200,34 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
 
 });
 
+const exportUserLogs=asyncHandler(async(req,res)=>{
+    let allUsersLists = await mongoMiddleware.GetAllUsers();
+    const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const workbook = new excelJs.Workbook();
+    const worksheet = workbook.addWorksheet("UserLogs");
 
+    worksheet.columns = [
+        { header: "UserName", key: "userName", width: 20 },
+        { header: "Password", key: "userPassword", width: 20 },
+        { header: "Role", key: "userRole", width: 20 },
+        { header: "Location", key: "officeLocation", width: 20 },
+        { header: "Action", key: "action", width: 20 },
+    ];
+    const userCollection = await getExcelUserData(allUsersLists, officeDetails);
+    worksheet.addRows(userCollection);
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + `Users.xlsx`
+    );
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+    });
 
+});
 
 
 
@@ -237,7 +263,16 @@ async function getExcelItemCollection(allParkingLists, officeDetails)
     return excelData;
 }
 
+async function getExcelUserData(allUsersData, officeDetails) {
+    allUsersData.forEach(p => {
+        p.officeLocation = p.locationId ? officeDetails.find(x => x.OfficeId == p.locationId).OfficeLocation:null;
+        p.action=null;
+    });
+    return allUsersData;
+}
 
 
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest };
+
+
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest, exportUserLogs };
