@@ -1,20 +1,6 @@
 const mongoClient = require("mongodb").MongoClient;
 const ObjectId = require("mongodb").ObjectId;
 
-module.exports.GetAllOfficeLocations = async () => {
-    let officeLocationDetails = null;
-    try {
-        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
-        var dbo = dbConnection.db(process.env.DB_NAME);
-        officeLocationDetails = await dbo.collection(process.env.LOCATIONS_COLLECTIONS_NAME).find().toArray();
-        dbConnection.close();
-    }
-    catch (exception) {
-        console.log(exception);
-    }
-    return officeLocationDetails.map(function ($loc) { return $loc["OfficeLocation"]; });
-}
-
 module.exports.GetParkingLocationsByOffice = async (officeName) => {
     let parkingLocationsDetails = null;
     try {
@@ -245,7 +231,6 @@ module.exports.UpdateParkingRequest = async (userName, requestId, status) => {
     return rejectionResult;
 }
 
-
 module.exports.GetReservationDetailsById = async (requestId) => {
     let reservationDetails = null;
     try {
@@ -309,7 +294,6 @@ module.exports.RegisterVehicle = async (payload) => {
     }
     return result;
 }
-
 
 module.exports.GetReservationRequestByUserName = async (userName, _limit) => {
     let reservationLog = null;
