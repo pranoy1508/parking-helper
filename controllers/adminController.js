@@ -1,18 +1,19 @@
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
-const ParkingDetails=require("../models/parkingDetails");
-const ParkingLogs=require("../models/parkingLogs");
-const _=require("lodash");
+const ParkingDetails = require("../models/parkingDetails");
+const ParkingLogs = require("../models/parkingLogs");
+const _ = require("lodash");
 const emailMiddleware = require("../middleware/emailMiddleware");
 const UserModel = require("../models/user.js");
-const excelJs=require("exceljs");
+const excelJs = require("exceljs");
 const ReservationRequest = require("../models/reservationRequest");
 
 const onLoad = asyncHandler(async (req, res) => {
     const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
     const officeDetails = fullDetails.map(function ($loc) { return $loc["OfficeLocation"]; });
-    const userDetails=await mongoMiddleware.GetAllUsers();
-    let reservedDetails = await mongoMiddleware.GetReservationRequestByUserName(req.session.users_id.userName,5);
+    const userDetails = await mongoMiddleware.GetAllUsers();
+    let reservedDetails = await mongoMiddleware.GetReservationRequestByUserName(req.session.users_id.userName);
+    reservedDetails = _.filter(reservedDetails, (res) => { return (new Date(res.reservationDate)>=new Date()) });
     for (let res of reservedDetails) {
         const linkedOffice = _.find(fullDetails, (office) => {
             if (office.ParkingLocations) {
@@ -28,7 +29,7 @@ const onLoad = asyncHandler(async (req, res) => {
         res.officeLocation = linkedOffice ? linkedOffice.OfficeLocation : null;
     }
     officeDetails.unshift("-- Please Select --");
-    let loadDetails={};
+    let loadDetails = {};
     loadDetails.officeDetails = officeDetails;
     loadDetails.userDetails = userDetails;
     loadDetails.reservedDetails = reservedDetails;
@@ -69,51 +70,44 @@ const updateLocationDetails = asyncHandler(async (req, res) => {
     else {
         await mongoMiddleware.UpdateParkingDetails(payload);
     }
-    return res.json({statusCode:200,message:"Updated Successfully"});
+    return res.json({ statusCode: 200, message: "Updated Successfully" });
 });
 
-const executeReservation = asyncHandler(async(req,res)=>{
-    const payload=req.body;
-    let executionType="";
-    if (payload.requestType==0)
-    {
-        await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId,"REJECTED");
-        executionType="Rejected";
+const executeReservation = asyncHandler(async (req, res) => {
+    const payload = req.body;
+    let executionType = "";
+    if (payload.requestType == 0) {
+        await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId, "REJECTED");
+        executionType = "Rejected";
     }
-    else if (payload.requestType == 1)
-    {
+    else if (payload.requestType == 1) {
         executionType = "Accepted";
         let requestDetails = await mongoMiddleware.GetReservationDetailsById(payload.requestId);
-        if (requestDetails)
-        {
+        if (requestDetails) {
             const locationDetails = await mongoMiddleware.GetParkingDetails(requestDetails.locationId);
             const startDate = `${requestDetails.reservationDate}T00:00:00`;
             const endDate = `${requestDetails.reservationDate}T23:59:59`;
             const bookedCount = await mongoMiddleware.GetVehicleCountByType(requestDetails.vehicleType, requestDetails.locationId, startDate, endDate);
             const totalCount = requestDetails.vehicleType == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
-            if (totalCount - bookedCount >= requestDetails.vehicleCount)
-            {
+            if (totalCount - bookedCount >= requestDetails.vehicleCount) {
                 await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, payload.requestId, "ACCEPTED");
-                for (let idx = 1; idx <= requestDetails.vehicleCount;idx++)
-                {
-                    let parkingLog={};
+                for (let idx = 1; idx <= requestDetails.vehicleCount; idx++) {
+                    let parkingLog = {};
                     parkingLog.vehicleType = requestDetails.vehicleType;
-                    parkingLog.vehicleNumber="N/A";
+                    parkingLog.vehicleNumber = "N/A";
                     parkingLog.parkingLocation = requestDetails.locationId;
-                    parkingLog.linkedRfidCard=null;
+                    parkingLog.linkedRfidCard = null;
                     parkingLog.parkingDate = new Date(requestDetails.reservationDate);
-                    parkingLog.createdBy="Park Whiz";
-                    parkingLog.ownerName = requestDetails.employeeName && requestDetails.employeeName.trim() != "" ? requestDetails.employeeName:`Guest_${idx}`;
-                    parkingLog.ownerId="N/A";
+                    parkingLog.createdBy = "Park Whiz";
+                    parkingLog.ownerName = requestDetails.employeeName && requestDetails.employeeName.trim() != "" ? requestDetails.employeeName : `Guest_${idx}`;
+                    parkingLog.ownerId = "N/A";
                     await ParkingLogs.create(parkingLog);
                 }
-                const parkingDetails=await mongoMiddleware.GetFullOfficeLocations();
-                parkingDetails.forEach(x=>{
-                    if (x.ParkingLocations)
-                    {
-                        x.ParkingLocations.forEach(p=>{
-                            if (p.LocationId == requestDetails.locationId)
-                            {
+                const parkingDetails = await mongoMiddleware.GetFullOfficeLocations();
+                parkingDetails.forEach(x => {
+                    if (x.ParkingLocations) {
+                        x.ParkingLocations.forEach(p => {
+                            if (p.LocationId == requestDetails.locationId) {
                                 requestDetails.officeName = x.OfficeLocation;
                                 requestDetails.parkingName = p.LocationName;
                             }
@@ -122,17 +116,17 @@ const executeReservation = asyncHandler(async(req,res)=>{
                 });
                 const adminDetails = await UserModel.find({ userRole: "ADMIN" });
                 const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
-                const emailSubject = process.env.APPROVED_EMAIL_SUBJECT.replace('$requestId', requestDetails.uniqueId).replace("$date",new Date().toISOString().split("T")[0]);
+                const emailSubject = process.env.APPROVED_EMAIL_SUBJECT.replace('$requestId', requestDetails.uniqueId).replace("$date", new Date().toISOString().split("T")[0]);
                 let emailBody = await createEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationApproved"), requestDetails, req.session.users_id.userName);
-                emailMiddleware.TriggerEmail(adminList,emailSubject,emailBody);
+                emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
             }
-            else{
-                res.json({ statusCode: 2022, message: `Requested parking spaces is more than available (${totalCount - bookedCount}) parking spaces.`})
+            else {
+                res.json({ statusCode: 2022, message: `Requested parking spaces is more than available (${totalCount - bookedCount}) parking spaces.` })
             }
         }
     }
     return res.json({ statusCode: 200, message: `${executionType} the request successfully` });
-    
+
 });
 
 const exportParkingLogs = asyncHandler(async (req, res) => {
@@ -178,18 +172,28 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
         }
 
         const reservationRequest = new ReservationRequest(reservationReq.locationId, reservationReq.empName, reservationReq.vehicleType, reservationReq.vehicleCount, reservationReq.reservationDate, new Date(), req.session.users_id.userName);
-        const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
-        if (reservationLogResponse) {
-            const adminDetails = await UserModel.find({ userRole: "ADMIN" });
-            const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
-            const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
-            let emailBody = await emailMiddleware.GetEmailBodyTemplate("reservationApproval").replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
-            emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
+        const parkingLogResponse = await createReservationParkingLog(reservationReq, req.session.users_id.userName);
+        if (parkingLogResponse == true) {
+            const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
+            if (reservationLogResponse) {
+                const adminDetails = await UserModel.find({ userRole: "ADMIN" });
+                const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
+                const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
+                const emailBody = await getReservationEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationApproval"), reservationReq, req.session.users_id.userName);
+                emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
+            }
+            res.json({
+                statusCode: 201,
+                message: `Successfully submitted the reservation request for ${reservationReq.reservationDate}`
+            });
         }
-        res.json({
-            statusCode: 201,
-            message: `Successfully submitted the reservation request for ${reservationReq.reservationDate}`
-        });
+        else {
+            res.json({
+                statusCode: 401,
+                message: `No available parking space for the date ${reservationReq.reservationDate}`
+            });
+        }
+
     }
     else {
         res.json({
@@ -200,7 +204,7 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
 
 });
 
-const exportUserLogs=asyncHandler(async(req,res)=>{
+const exportUserLogs = asyncHandler(async (req, res) => {
     let allUsersLists = await mongoMiddleware.GetAllUsers();
     const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     const workbook = new excelJs.Workbook();
@@ -229,22 +233,18 @@ const exportUserLogs=asyncHandler(async(req,res)=>{
 
 });
 
-
-
-async function createEmailBody(stringBody, requestDetails,userName)
-{
+async function createEmailBody(stringBody, requestDetails, userName) {
     return stringBody.replace("$requestId", requestDetails.uniqueId).replace("$admin", userName).replace("$date", new Date().toISOString().split("T")[0]).replace("$office", requestDetails.officeName).replace("$location", requestDetails.parkingName).replace("$resDate", requestDetails.reservationDate).replace("$vType", requestDetails.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler").replace("$count", requestDetails.vehicleCount).replace("$requestorName", requestDetails.requestedBy);
 }
 
-async function getExcelItemCollection(allParkingLists, officeDetails)
-{
-    let excelData=[];
-    allParkingLists.forEach(p=>{
-        let item={};
+async function getExcelItemCollection(allParkingLists, officeDetails) {
+    let excelData = [];
+    allParkingLists.forEach(p => {
+        let item = {};
         item.reqDate = p.parkingDate.toISOString().split("T")[0];
         item.empId = p.ownerName;
         item.empName = p.ownerId;
-        item.vehicleType = p.vehicleType==0?"2 Wheeler":"4 Wheeler";
+        item.vehicleType = p.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler";
         item.vehicleNumber = p.vehicleNumber;
         item.rfid = p.linkedRfidCard;
         item.inTime = p.parkingDate.toISOString().split("T")[1];
@@ -265,10 +265,39 @@ async function getExcelItemCollection(allParkingLists, officeDetails)
 
 async function getExcelUserData(allUsersData, officeDetails) {
     allUsersData.forEach(p => {
-        p.officeLocation = p.locationId ? officeDetails.find(x => x.OfficeId == p.locationId).OfficeLocation:null;
-        p.action=null;
+        p.officeLocation = p.locationId ? officeDetails.find(x => x.OfficeId == p.locationId).OfficeLocation : null;
+        p.action = null;
     });
     return allUsersData;
+}
+
+async function createReservationParkingLog(reservationReq, userName) {
+    let parkingLogged = false;
+    const locationDetails = await mongoMiddleware.GetParkingDetails(reservationReq.locationId);
+    const startDate = `${reservationReq.reservationDate}T00:00:00`;
+    const endDate = `${reservationReq.reservationDate}T23:59:59`;
+    const bookedCount = await mongoMiddleware.GetVehicleCountByType(reservationReq.vehicleType, reservationReq.locationId, startDate, endDate);
+    const totalCount = reservationReq.vehicleType == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
+    if (totalCount - bookedCount >= reservationReq.vehicleCount) {
+        for (let idx = 1; idx <= reservationReq.vehicleCount; idx++) {
+            let parkingLog = {};
+            parkingLog.vehicleType = reservationReq.vehicleType;
+            parkingLog.vehicleNumber = "N/A";
+            parkingLog.parkingLocation = reservationReq.locationId;
+            parkingLog.linkedRfidCard = null;
+            parkingLog.parkingDate = new Date(reservationReq.reservationDate);
+            parkingLog.createdBy = userName;
+            parkingLog.ownerName = reservationReq.empName && reservationReq.empName.trim() != "" ? reservationReq.empName : `Guest_${idx}`;
+            parkingLog.ownerId = "N/A";
+            await ParkingLogs.create(parkingLog);
+            parkingLogged = true;
+        }
+    }
+    return parkingLogged;
+}
+
+async function getReservationEmailBody(template, reservationRequest,userName) {
+    return template.replace('$date', reservationRequest.reservationDate).replace('$requestor', userName).replace('$office', reservationRequest.officeLocation).replace('$location', reservationRequest.location);
 }
 
 
