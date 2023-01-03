@@ -3,12 +3,10 @@ const mongoMiddleware = require("../middleware/mongoMiddleware");
 const ParkingDetails=require("../models/parkingDetails");
 const ParkingLogs=require("../models/parkingLogs");
 const _=require("lodash");
-const emailTemplates = require("../templates/approvalEmailTemplate.json");
 const emailMiddleware = require("../middleware/emailMiddleware");
 const UserModel = require("../models/user.js");
 const excelJs=require("exceljs");
 const ReservationRequest = require("../models/reservationRequest");
-const passwordGen = require("generate-password");
 
 const onLoad = asyncHandler(async (req, res) => {
     const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
@@ -125,7 +123,7 @@ const executeReservation = asyncHandler(async(req,res)=>{
                 const adminDetails = await UserModel.find({ userRole: "ADMIN" });
                 const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
                 const emailSubject = process.env.APPROVED_EMAIL_SUBJECT.replace('$requestId', requestDetails.uniqueId).replace("$date",new Date().toISOString().split("T")[0]);
-                let emailBody = await createEmailBody(emailTemplates.find(x => x.emailType == "reservationApproved").template, requestDetails, req.session.users_id.userName);
+                let emailBody = await createEmailBody(await emailMiddleware.GetEmailBodyTemplate("reservationApproved"), requestDetails, req.session.users_id.userName);
                 emailMiddleware.TriggerEmail(adminList,emailSubject,emailBody);
             }
             else{
@@ -185,7 +183,7 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
             const adminDetails = await UserModel.find({ userRole: "ADMIN" });
             const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
             const emailSubject = process.env.REQUEST_EMAIL_SUBJECT.replace('$date', reservationReq.reservationDate).replace("$requestId", reservationRequest.uniqueId);
-            let emailBody = emailTemplates.find(x => x.emailType == "reservationApproval").template.replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
+            let emailBody = await emailMiddleware.GetEmailBodyTemplate("reservationApproval").replace('$date', reservationRequest.reservationDate).replace('$requestor', reservationRequest.requestedBy).replace('$office', reservationReq.officeLocation).replace('$location', reservationReq.location);
             emailMiddleware.TriggerEmail(adminList, emailSubject, emailBody);
         }
         res.json({

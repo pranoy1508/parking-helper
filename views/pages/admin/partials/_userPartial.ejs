@@ -4,7 +4,7 @@
     </b></h1>
 <div class="d-flex justify-content-between">
     <div class="d-flex" style="flex-direction: row-reverse;">
-        <button type="button" style="float: right;" onclick="addUser()" class="btn btn-success" name="btnAddUser"><i
+        <button type="button" style="float: right;" onclick="addUser()" class="btn btn-success d-none" name="btnAddUser"><i
                 class="fa fa-solid fa-plus"></i> Add User</button>&nbsp;
         <button type="button" style="float: right;" class="btn btn-primary" data-toggle="modal"
             data-target="#exampleModal"><i class="fa-solid fa fa-file-arrow-up"></i> Import Users</button>&nbsp;
@@ -12,8 +12,6 @@
             Export Users List</button>
     </div>
 </div>
-
-</button>
 <br />
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
@@ -58,7 +56,7 @@
             <tbody>
                 <% if(items.userDetails.length===0) { %>
                     <p>No users found !</p>
-                    <% } else {let i=1 ; items.userDetails.forEach(function(user){ %>
+                    <% } else {let i=1 ; items.userDetails.forEach(function(user){ if(i<=5){ %>
                         <tr>
                             <td>
                                 <%= i %>
@@ -71,7 +69,7 @@
                                     placeholder="User Role" readonly /></td>
 
                         </tr>
-                        <% i++; }); } %>
+                        <% i++; }}); } %>
             </tbody>
         </table>
         <br><br>

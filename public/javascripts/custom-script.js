@@ -504,7 +504,7 @@ function addUserFromExcel() {
                 success: function (data) {
                     //$(".addItemExcel").html("Submit");
                     $(".addItemExcel").prop("disabled", false);
-                    if (data.status == 1) {
+                    if (data.statusCode == 200) {
                         showSuccessToast(data.message);
                         setTimeout(function () {
                             window.location.reload();

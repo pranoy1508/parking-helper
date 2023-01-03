@@ -1,4 +1,7 @@
 var nodemailer = require('nodemailer');
+const emailTemplates = require("../templates/approvalEmailTemplate.json");
+
+
 module.exports.TriggerEmail = async (toList, emailSubject, emailBody) => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -20,6 +23,10 @@ module.exports.TriggerEmail = async (toList, emailSubject, emailBody) => {
         console.log(exception);
     }
 
+}
+
+module.exports.GetEmailBodyTemplate = async (emailType) => {
+    return emailTemplates.find(x => x.emailType == emailType).template;
 }
 
 

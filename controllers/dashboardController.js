@@ -3,7 +3,6 @@ const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
 const VehicleDetails = require("../models/vehicleDetails");
 const emailMiddleware = require("../middleware/emailMiddleware");
-const emailTemplates = require("../templates/approvalEmailTemplate.json");
 
 
 
@@ -88,7 +87,9 @@ const registerVehicle = asyncHandler(async (req, res) => {
         mongoMiddleware.RegisterVehicle(vehicle);
     }
     const emailSubject = process.env.VEHICLE_REGISTRATION_SUBJECT.replace('$user', req.session.users_id.userName);
-    emailMiddleware.TriggerEmail(req.session.users_id.userName, emailSubject, emailTemplates.find(x => x.emailType == "vehicleRegistration").template);
+    emailMiddleware.TriggerEmail(req.session.users_id.userName, emailSubject,await emailMiddleware.GetEmailBodyTemplate("vehicleRegistration"));
     return res.json("Successfully registered the vehicle");
 });
+
+
 module.exports = { onLoad, checkAvailability, registerVehicle };

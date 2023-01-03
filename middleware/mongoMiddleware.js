@@ -298,7 +298,7 @@ module.exports.RegisterVehicle = async (payload) => {
 module.exports.GetReservationRequestByUserName = async (userName, _limit) => {
     let reservationLog = null;
     try {
-        const query = { "requestedBy": userName,"status":"BOOKED" };
+        const query = { "requestedBy": userName, "status": "BOOKED" };
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
         const sort = { reservationDate: 1 };
@@ -309,4 +309,17 @@ module.exports.GetReservationRequestByUserName = async (userName, _limit) => {
         console.log(exception);
     }
     return reservationLog;
+}
+
+module.exports.RemoveVehicleDetailsByUserName = async (userName) => {
+    try {
+        const query = { "ownerName": userName };
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        await dbo.collection(process.env.VEHICLE_DETAILS_COLLECTION_NAME).deleteMany(query);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
 }
