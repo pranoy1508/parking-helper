@@ -121,7 +121,7 @@ async function getLocationId(locationName) {
 }
 
 async function getEmailBodyForUserAddition(template, newUser) {
-    return template.replace("$user", newUser.userName).replace("$pwd", newUser.userPassword);
+    return template.replace("$user", newUser.userName).replace("$pwd", newUser.userPassword).replace("$userName", newUser.userName);
 }
 
 
