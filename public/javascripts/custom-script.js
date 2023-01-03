@@ -375,6 +375,15 @@ function submitReservationRequest() {
     request.reservationDate = $("#res_date").val();
     request.officeLocation = $("#location_ddl_res").val();
     request.location = $("#parking_location_ddl_res option:selected").text().trim();
+    if (request.empName.trim() == "" || request.empName==null)
+    {
+        showErrorToast(`Name is mandatory for reserving a parking`);
+        return;
+    }
+    if (request.reservationDate.trim() == "" || request.reservationDate == null) {
+        showErrorToast(`Reservation Date is mandatory for reserving a parking`);
+        return;
+    }
     $.ajax({
         type: "POST",
         url: `/admin/submitReservation`,

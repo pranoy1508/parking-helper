@@ -6,6 +6,7 @@ const mongoMiddleware = require("../middleware/mongoMiddleware");
 
 const onLoad = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
     const vehicleDetails = await mongoMiddleware.GetAllVehicleInformation();
     const reservationResponse = await mongoMiddleware.GetParkingRequestsByUserName(req.session.users_id.userName, 5);
     const sysDate = new Date().toISOString().split('T')[0];
@@ -107,6 +108,7 @@ const addParkingLogs = asyncHandler(async (req, res) => {
 
 const getAvailabilityView=asyncHandler(async(req,res)=>{
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
     const sysDate = new Date().toISOString().split('T')[0];
     const startDate = `${sysDate}T00:00:00`;
     const endDate = `${sysDate}T23:59:59`;
