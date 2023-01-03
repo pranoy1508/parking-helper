@@ -323,3 +323,16 @@ module.exports.RemoveVehicleDetailsByUserName = async (userName) => {
         console.log(exception);
     }
 }
+
+module.exports.RemoveParkingDetails = async (ownerName, startDate,endDate, parkingLocation) => {
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        const query = { "ownerName": ownerName, "parkingDate": { $gte:new Date(startDate), $lt:new Date(endDate)}, "parkingLocation": parkingLocation };
+        mongoResult = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).deleteMany(query);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+}

@@ -375,8 +375,7 @@ function submitReservationRequest() {
     request.reservationDate = $("#res_date").val();
     request.officeLocation = $("#location_ddl_res").val();
     request.location = $("#parking_location_ddl_res option:selected").text().trim();
-    if (request.empName.trim() == "" || request.empName==null)
-    {
+    if (request.empName.trim() == "" || request.empName == null) {
         showErrorToast(`Name is mandatory for reserving a parking`);
         return;
     }
@@ -399,7 +398,9 @@ function submitReservationRequest() {
             }
             else {
                 showSuccessToast(data.message);
-                location.reload();
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
             }
         },
         error: function () {
@@ -442,11 +443,10 @@ function executeReservation(requestIdStr, executionType) {
             showLoadingToast("In Progress...");
         },
         success: function (data) {
-            if(data.statusCode==2022)
-            {
+            if (data.statusCode == 2022) {
                 showErrorToast(data.message);
             }
-            else{
+            else {
                 showSuccessToast(data.message);
                 location.reload();
             }
@@ -457,13 +457,11 @@ function executeReservation(requestIdStr, executionType) {
     });
 }
 
-function showExportDetails()
-{
+function showExportDetails() {
     $('#details_div_date').removeClass("d-none");
 }
 
-function submitExport()
-{
+function submitExport() {
     const excelUrl = `/admin/exportParkingLogs?startDate=${$("#dtStartDate").val()}&endDate=${$("#dtEndDate").val()}`;
     window.open(excelUrl);
 }
@@ -534,8 +532,34 @@ function addUserFromExcel() {
     reader.readAsArrayBuffer(oFile);
 }
 
-
 function exportUserDetails() {
     const excelUrl = `/admin/export_user_details`;
     window.open(excelUrl);
+}
+
+function cancelReservation(requestId) {
+    $.ajax({
+        type: "POST",
+        url: `/admin/cancel_reservation`,
+        cache: false,
+        data: { "id": requestId },
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("In Progress...");
+        },
+        success: function (data) {
+            if (data.statusCode == 2022) {
+                showErrorToast(data.message);
+            }
+            else {
+                showSuccessToast(data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+            }
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
 }

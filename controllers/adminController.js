@@ -233,6 +233,20 @@ const exportUserLogs = asyncHandler(async (req, res) => {
 
 });
 
+const cancelParkingRequest=asyncHandler(async(req,res)=>{
+    const {id} = req.body;
+    const reservationRequestDetails=await mongoMiddleware.GetReservationDetailsById(id);
+    const startDate = `${reservationRequestDetails.reservationDate}T00:00:00`;
+    const endDate = `${reservationRequestDetails.reservationDate}T23:59:59`;
+    await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, id,"CANCELLED");
+    await mongoMiddleware.RemoveParkingDetails(reservationRequestDetails.employeeName, startDate,endDate, reservationRequestDetails.locationId);
+    res.json({
+        statusCode: 200,
+        message: `Request ${reservationRequestDetails.uniqueId} cancelled successfully.`
+    });
+});
+
+
 async function createEmailBody(stringBody, requestDetails, userName) {
     return stringBody.replace("$requestId", requestDetails.uniqueId).replace("$admin", userName).replace("$date", new Date().toISOString().split("T")[0]).replace("$office", requestDetails.officeName).replace("$location", requestDetails.parkingName).replace("$resDate", requestDetails.reservationDate).replace("$vType", requestDetails.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler").replace("$count", requestDetails.vehicleCount).replace("$requestorName", requestDetails.requestedBy);
 }
@@ -304,4 +318,4 @@ async function getReservationEmailBody(template, reservationRequest,userName) {
 
 
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest, exportUserLogs };
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, executeReservation, exportParkingLogs, submitReservationRequest, exportUserLogs, cancelParkingRequest };
