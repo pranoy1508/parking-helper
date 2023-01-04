@@ -1,11 +1,10 @@
 $(document).ready(function () {
-    setInterval(()=>{
+    setInterval(() => {
         refreshAvailabilityView()
-    },5000);
+    }, 5000);
 });
 
-function refreshAvailabilityView()
-{
+function refreshAvailabilityView() {
     $.ajax({
         type: "GET",
         url: `/parking/getAvailability`,
@@ -22,16 +21,13 @@ function refreshAvailabilityView()
     });
 }
 
-function getReservationDetailsForGuest()
-{
-    const inputGuestName= $("#txt_guestName").val();
+function getReservationDetailsForGuest() {
+    const inputGuestName = $("#txt_guestName").val();
     const tableData = $("#tbl_check_in");
     const trData = tableData[0].getElementsByTagName("tr");
-    for(let idx=1;idx<trData.length;idx++)
-    {
+    for (let idx = 1; idx < trData.length; idx++) {
         const tdGuestData = trData[idx].getElementsByTagName("td")[1];
-        if (tdGuestData)
-        {
+        if (tdGuestData) {
             const guestName = tdGuestData.innerText.trim();
             if (guestName.toUpperCase().indexOf(inputGuestName.toUpperCase()) > -1) {
                 trData[idx].style.display = "";
@@ -43,5 +39,28 @@ function getReservationDetailsForGuest()
 }
 
 function checkInGuest(reservationId) {
-    alert(reservationId);
+    $.ajax({
+        type: "POST",
+        url: `/parking/check_in_guest`,
+        cache: false,
+        data: { "reservationId": reservationId },
+        dataType: "json",
+        beforeSend: function () {
+            //showLoadingToast("Registering...");
+        },
+        success: function (data) {
+            if (data.statusCode == 2021) {
+                showErrorToast(data.message);
+            }
+            else {
+                showSuccessToast(data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
 }

@@ -197,7 +197,7 @@ const cancelParkingRequest=asyncHandler(async(req,res)=>{
     const startDate = `${reservationRequestDetails.reservationDate}T00:00:00`;
     const endDate = `${reservationRequestDetails.reservationDate}T23:59:59`;
     await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, id,"CANCELLED");
-    await mongoMiddleware.RemoveParkingDetails(reservationRequestDetails.employeeName, startDate,endDate, reservationRequestDetails.locationId);
+    await mongoMiddleware.RemoveParkingDetails(reservationRequestDetails.guestName, startDate,endDate, reservationRequestDetails.locationId);
     const adminDetails = await UserModel.find({ userRole: "ADMIN" });
     const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
     const emailSubject = process.env.CANCELLED_EMAIL_SUBJECT.replace('$date', reservationRequestDetails.reservationDate).replace("$requestId", reservationRequestDetails.uniqueId);

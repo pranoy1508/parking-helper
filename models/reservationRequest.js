@@ -1,8 +1,8 @@
 const passwordGen = require("generate-password");
 class ReservationRequest {
-    constructor(_locationId,_employeeName, _vehicleType, _vehicleCount, _reservationDate, _createdDate,_requestedBy) {
+    constructor(_locationId,_guestName, _vehicleType, _vehicleCount, _reservationDate, _createdDate,_requestedBy) {
         this.locationId = _locationId;
-        this.employeeName = _employeeName;
+        this.guestName = _guestName;
         this.vehicleType = parseInt(_vehicleType);
         this.vehicleCount=parseInt(_vehicleCount);
         this.reservationDate = _reservationDate;

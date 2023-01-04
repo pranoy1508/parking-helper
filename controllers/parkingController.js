@@ -1,7 +1,8 @@
 const _ = require("lodash");
 const asyncHandler = require("express-async-handler");
 const mongoMiddleware = require("../middleware/mongoMiddleware");
-
+const emailMiddleware = require("../middleware/emailMiddleware");
+const UserModel = require("../models/user.js");
 
 
 const onLoad = asyncHandler(async (req, res) => {
@@ -9,7 +10,7 @@ const onLoad = asyncHandler(async (req, res) => {
     const sysDate = new Date().toISOString().split('T')[0];
     officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
     const vehicleDetails = await mongoMiddleware.GetAllVehicleInformation();
-    let reservationResponse = await mongoMiddleware.GetReservationDetailsByStatus("BOOKED",sysDate);
+    let reservationResponse = await mongoMiddleware.GetReservationDetailsByStatus("BOOKED", sysDate);
     const startDate = `${sysDate}T00:00:00`;
     const endDate = `${sysDate}T23:59:59`;
     for (let office of officeDetails) {
@@ -97,7 +98,7 @@ const addParkingLogs = asyncHandler(async (req, res) => {
             });
         }
     }
-    else{
+    else {
         return res.json({
             statusCode: 4044,
             message: `No Available Parking Space available for ${sysDate}`,
@@ -106,7 +107,7 @@ const addParkingLogs = asyncHandler(async (req, res) => {
 
 });
 
-const getAvailabilityView=asyncHandler(async(req,res)=>{
+const getAvailabilityView = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
     const sysDate = new Date().toISOString().split('T')[0];
@@ -128,17 +129,46 @@ const getAvailabilityView=asyncHandler(async(req,res)=>{
     res.render("pages/security/partials/_freeViewPartial", {
         items: responseDetails,
         groupName: "security",
-        layout:false
+        layout: false
     });
 });
 
-const checkInGuest=asyncHandler(async(req,res)=>{
-    const {reservationId}=req.body;
-    const reservationUpdateResult = await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, reservationId,"CHECKED-IN");
-    res.json({
-        statusCode: 200,
-        message: `Checked in guest successfully.`
+const checkInGuest = asyncHandler(async (req, res) => {
+    const { reservationId } = req.body;
+    let reservationDetails = await mongoMiddleware.GetReservationDetailsById(reservationId);
+    if (reservationDetails) {
+        await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, reservationId, "CHECKED-IN");
+        const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+        const linkedOffice = _.find(officeDetails, (office) => {
+            if (office.ParkingLocations) {
+                const contextParking = _.find(office.ParkingLocations, ($p) => {
+                    if ($p.LocationId == reservationDetails.locationId) {
+                        reservationDetails.parkingLocation = $p.LocationName;
+                        return true;
+                    }
+                });
+                return contextParking;
+            }
+        });
+        reservationDetails.officeLocation = linkedOffice ? linkedOffice.OfficeLocation : null;
+        const adminDetails = await UserModel.find({ userRole: "ADMIN" });
+        const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
+        const emailBody = await getCheckInEmailBody(await emailMiddleware.GetEmailBodyTemplate("guestCheckIn"), reservationDetails);
+        emailMiddleware.TriggerEmail(adminList, `Checked-In : ${reservationDetails.uniqueId} - Guest has checked-in`, emailBody);
+        res.json({
+            statusCode: 200,
+            message: `Checked in guest successfully.`
+        });
+    }
+    else res.json({
+        statusCode: 2022,
+        message: `No reservations found for Id : ${reservationId}`
     });
 });
+
+
+async function getCheckInEmailBody(templateStr, reservationDetails) {
+    return templateStr.replace("$guest", reservationDetails.guestName).replace("$date", new Date().toISOString().split(".")[0]).replace("$office", reservationDetails.officeLocation).replace("$location", reservationDetails.parkingLocation);
+}
 
 module.exports = { onLoad, addParkingLogs, getAvailabilityView, checkInGuest };

@@ -425,7 +425,7 @@ function bindReservationData(reservationLogStr) {
     $("#modTxtCreatedDate").val(reservationLog.createdDate.split("T")[0]);
     $("#modTxtVehicleType").val(reservationLog.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler");
     $("#modTxtVehicleCount").val(reservationLog.vehicleCount);
-    $("#modTxtGuestName").val(reservationLog.employeeName);
+    $("#modTxtGuestName").val(reservationLog.guestName);
     $("#modTxtRequestedBy").val(reservationLog.requestedBy);
     $("#lblRequestId").empty();
     $("#lblRequestId").text(reservationLog.uniqueId);
