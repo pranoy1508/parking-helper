@@ -56,6 +56,20 @@ const onLoad = asyncHandler(async (req, res) => {
 const addParkingLogs = asyncHandler(async (req, res) => {
     const parkingDetails = req.body;
     const sysDate = new Date().toISOString().split('T')[0];
+    if (isNaN(parseInt(parkingDetails.vehicleType))) {
+        return res.json({
+            statusCode: 4044,
+            message: `No Available Parking Space available for ${sysDate}`,
+        });
+    }
+    const vehicleDetails = await mongoMiddleware.GetVehicleInformationByName(parkingDetails.empName);
+    const isValidVehicleRes = await isValidVehicle(vehicleDetails, parkingDetails);
+    if (!vehicleDetails || !isValidVehicleRes) {
+        return res.json({
+            statusCode: 4044,
+            message: `Invalid Details entered for ${parkingDetails.vehicleNumber}`,
+        });
+    }
     const startDate = `${sysDate}T00:00:00`;
     const endDate = `${sysDate}T23:59:59`;
     const locationDetails = await mongoMiddleware.GetParkingDetails(parkingDetails.parkingLocation);
@@ -169,6 +183,15 @@ const checkInGuest = asyncHandler(async (req, res) => {
 
 async function getCheckInEmailBody(templateStr, reservationDetails) {
     return templateStr.replace("$guest", reservationDetails.guestName).replace("$date", new Date().toISOString().split(".")[0]).replace("$office", reservationDetails.officeLocation).replace("$location", reservationDetails.parkingLocation);
+}
+
+
+async function isValidVehicle(vehicleDetails, parkingDetails) {
+    const contextVehicle = vehicleDetails.find(x => x.vehicleNumber == parkingDetails.vehicleNumber);
+    if (contextVehicle){
+        return (contextVehicle.vehicleType == parseInt(parkingDetails.vehicleType));
+    }
+    return false;
 }
 
 module.exports = { onLoad, addParkingLogs, getAvailabilityView, checkInGuest };

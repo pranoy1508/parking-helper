@@ -291,7 +291,8 @@ function saveParkingLog(vehicleStr) {
                 location.reload();
             }
         },
-        error: function () {
+        error: function (ex) {
+            console.log(ex);
             showErrorToast("Something went wrong. Please try again");
         },
     });
