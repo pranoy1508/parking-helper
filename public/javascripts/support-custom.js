@@ -21,3 +21,27 @@ function refreshAvailabilityView()
         },
     });
 }
+
+function getReservationDetailsForGuest()
+{
+    const inputGuestName= $("#txt_guestName").val();
+    const tableData = $("#tbl_check_in");
+    const trData = tableData[0].getElementsByTagName("tr");
+    for(let idx=1;idx<trData.length;idx++)
+    {
+        const tdGuestData = trData[idx].getElementsByTagName("td")[1];
+        if (tdGuestData)
+        {
+            const guestName = tdGuestData.innerText.trim();
+            if (guestName.toUpperCase().indexOf(inputGuestName.toUpperCase()) > -1) {
+                trData[idx].style.display = "";
+            } else {
+                trData[idx].style.display = "none";
+            }
+        }
+    }
+}
+
+function checkInGuest(reservationId) {
+    alert(reservationId);
+}

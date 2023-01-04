@@ -9,6 +9,9 @@
                         <li class="nav-item active "><a href="#parkingDetails" role="tab" data-toggle="tab"
                                 class="nav-link active fa fa-cog"> Parking Data</a>
                         </li>
+                        <li class="nav-item"><a href="#checkIn" role="tab" data-toggle="tab" class="nav-link fa fa-cog">
+                                Check-In</a>
+                        </li>
                     </ul>
                     <!-- Tabs Navigations -->
 
@@ -17,6 +20,9 @@
                     <div class="tab-content">
                         <div class="tab-pane container active" id="parkingDetails">
                             <%- include('partials/_parkingLogs.ejs') %>
+                        </div>
+                        <div class="tab-pane container fade" id="checkIn">
+                            <%- include('partials/_checkInPartials.ejs') %>
                         </div>
                     </div>
                 </div>

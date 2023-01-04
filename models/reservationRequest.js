@@ -9,7 +9,7 @@ class ReservationRequest {
         this.createdDate=_createdDate,
         this.requestedBy=_requestedBy;
         this.modifiedDate=new Date();
-        this.approvedBy=null;
+        this.updatedBy=null;
         this.status="BOOKED";
         this.uniqueId = "PH-"+ passwordGen.generate({
             length: 10,

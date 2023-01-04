@@ -6,10 +6,10 @@ const mongoMiddleware = require("../middleware/mongoMiddleware");
 
 const onLoad = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const sysDate = new Date().toISOString().split('T')[0];
     officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
     const vehicleDetails = await mongoMiddleware.GetAllVehicleInformation();
-    const reservationResponse = await mongoMiddleware.GetParkingRequestsByUserName(req.session.users_id.userName, 5);
-    const sysDate = new Date().toISOString().split('T')[0];
+    let reservationResponse = await mongoMiddleware.GetReservationDetailsByStatus("BOOKED",sysDate);
     const startDate = `${sysDate}T00:00:00`;
     const endDate = `${sysDate}T23:59:59`;
     for (let office of officeDetails) {
@@ -132,4 +132,13 @@ const getAvailabilityView=asyncHandler(async(req,res)=>{
     });
 });
 
-module.exports = { onLoad, addParkingLogs, getAvailabilityView };
+const checkInGuest=asyncHandler(async(req,res)=>{
+    const {reservationId}=req.body;
+    const reservationUpdateResult = await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, reservationId,"CHECKED-IN");
+    res.json({
+        statusCode: 200,
+        message: `Checked in guest successfully.`
+    });
+});
+
+module.exports = { onLoad, addParkingLogs, getAvailabilityView, checkInGuest };

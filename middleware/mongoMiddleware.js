@@ -217,7 +217,7 @@ module.exports.UpdateParkingRequest = async (userName, requestId, status) => {
             { "_id": new ObjectId(requestId) },
             {
                 $set: {
-                    "approvedBy": userName,
+                    "updatedBy": userName,
                     "status": status,
                     "modifiedDate": new Date()
                 }
@@ -335,4 +335,18 @@ module.exports.RemoveParkingDetails = async (ownerName, startDate,endDate, parki
     catch (exception) {
         console.log(exception);
     }
+}
+module.exports.GetReservationDetailsByStatus = async (status,queryDate) => {
+    let reservationDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        const query = { "reservationDate": queryDate, "status":status};
+        reservationDetails = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).find(query).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return reservationDetails;
 }
