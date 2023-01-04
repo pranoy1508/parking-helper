@@ -4,11 +4,12 @@
     </b></h1>
 <div class="d-flex justify-content-between">
     <div class="d-flex" style="flex-direction: row-reverse;">
-        <button type="button" style="float: right;" onclick="addUser()" class="btn btn-success d-none" name="btnAddUser"><i
-                class="fa fa-solid fa-plus"></i> Add User</button>&nbsp;
+        <button type="button" style="float: right;" onclick="addUser()" class="btn btn-success d-none"
+            name="btnAddUser"><i class="fa fa-solid fa-plus"></i> Add User</button>&nbsp;
         <button type="button" style="float: right;" class="btn btn-primary" data-toggle="modal"
             data-target="#exampleModal"><i class="fa-solid fa fa-file-arrow-up"></i> Import Users</button>&nbsp;
-        <button type="button" style="float: right;" class="btn btn-info" onclick="exportUserDetails()"><i class="fa-solid fa-file-arrow-down"></i>
+        <button type="button" style="float: right;" class="btn btn-info" onclick="exportUserDetails()"><i
+                class="fa-solid fa-file-arrow-down"></i>
             Export Users List</button>
     </div>
 </div>
@@ -44,70 +45,25 @@
 </div>
 <div class="card">
     <div class="body table-responsive">
-        <h4>Details for Admin / Support (ONLY) :</h4>
+        <h4>Search Users :</h4>
         <br>
-        <table id="user_tbl" class="table table-striped table-bordered" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>UserName</th>
-                    <th>Password</th>
-                    <th>Role</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if(items.userDetails.length===0) { %>
-                    <p>No users found !</p>
-                    <% } else {let i=1 ; items.userDetails.forEach(function(user){ if(i<=5){ %>
-                        <tr>
-                            <td>
-                                <%= i %>
-                            </td>
-                            <td><input type="text" class="form-control" value="<%= user.userName %>" name="userName"
-                                    placeholder="User Name" readonly /></td>
-                            <td><input type="text" class="form-control" value="<%= user.userPassword %>" name="password"
-                                    placeholder="Password" readonly /></td>
-                            <td><input type="text" class="form-control" value="<%= user.userRole %>" name="Role"
-                                    placeholder="User Role" readonly /></td>
-
-                        </tr>
-                        <% i++; }}); } %>
-            </tbody>
-        </table>
-        <br><br>
-        <div class="container d-none" name="div_add_user">
-            <h5>Addition of User : </h5>
-            <br>
-            <table id="user_add_tbl" class="table table-striped table-bordered" style="width:100%">
-                <thead>
-                    <th>UserName</th>
-                    <th>Password</th>
-                    <th>Role</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <input type="email" class="form-control" name="add_userName"
-                                placeholder="Enter the user Name">
-                        </td>
-                        <td>
-                            <input type="text" class="form-control" name="password"
-                                placeholder="Password will be auto-generated" readonly>
-                        </td>
-                        <td>
-                            <select class="form-select form-control" name="add_user_role"
-                                aria-label="Default select example">
-                                <option value="USER">User</option>
-                                <option value="SUPPORT">Support</option>
-                                <option value="ADMIN">Admin</option>
-                            </select>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <button type="button" onclick="saveUser()" class="btn btn-primary" name="btnSaveUser">Save</button>
-            <button type="button" onclick="cancelUserAddition()" class="btn btn-danger" style="float: right;"
-                name="btnCancelUserAddition">Cancel</button>
+        <div>
+            <div class="input-group mb-4">
+                <input type="search" placeholder="Search here with Email Id...." class="form-control"
+                    id="txtSearchReqUser" onkeyup="clearView(this)">
+                <div class="input-group-append">
+                    <button id="button-addon-userSearch" type="button" onclick="searchUserByEmail()"
+                        class="btn btn-primary"> <i class="fa fa-search"> </i>
+                    </button>
+                </div>
+            </div>
         </div>
+        <table id="user_tbl" class="table table-striped table-bordered" style="width:100%">
+        </table>
+    </div>
+    <hr>
+    <div class="body table-responsive">
+        <h4>Export History (Last 5): </h4>
+        <hr>
     </div>
 </div>

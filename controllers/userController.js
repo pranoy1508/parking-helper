@@ -116,6 +116,21 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
     }
 });
 
+const getUserDetailsByUserName=asyncHandler(async(req,res)=>{
+    const userDetails = await UserModel.findOne({ userName: req.query.user });
+    if(!userDetails)
+    {
+        return res.json(`<p><h5 style="font-weight:bold;color:red">No user found for ${req.query.user}</h5></p>`);
+    }
+    let result={};
+    result.userDetails = [userDetails];
+    res.render("pages/admin/partials/_userViewPartial", {
+        items: result,
+        groupName: "admin",
+        layout: false
+    });
+});
+
 async function getLocationId(locationName) {
     const locationDetails = await mongoMiddleware.GetFullOfficeLocations();
     const contextOffice = _.filter(locationDetails, ($loc) => { return $loc.OfficeLocation == locationName.trim() });
@@ -127,4 +142,4 @@ async function getEmailBodyForUserAddition(template, newUser) {
 }
 
 
-module.exports = { getAllUserDetails, addUser, addUsersViaExcel };
+module.exports = { getAllUserDetails, addUser, addUsersViaExcel, getUserDetailsByUserName };
