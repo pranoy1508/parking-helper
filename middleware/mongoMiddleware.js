@@ -324,11 +324,11 @@ module.exports.RemoveVehicleDetailsByUserName = async (userName) => {
     }
 }
 
-module.exports.RemoveParkingDetails = async (ownerName, startDate,endDate, parkingLocation) => {
+module.exports.RemoveParkingDetails = async (uniqueId, parkingLocation) => {
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        const query = { "ownerName": ownerName, "parkingDate": { $gte:new Date(startDate), $lt:new Date(endDate)}, "parkingLocation": parkingLocation };
+        const query = { "linkedReservationId": uniqueId, "parkingLocation": parkingLocation };
         mongoResult = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).deleteMany(query);
         dbConnection.close();
     }

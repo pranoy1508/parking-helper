@@ -12,7 +12,12 @@ function searchById() {
                 //showLoadingToast("Adding details...");
             },
             success: function (data) {
-                $("#tbl_reservations").html(data);
+                if (data.indexOf("404") > -1) {
+                    showErrorToast(data);
+                }
+                else {
+                    $("#tbl_reservations").html(data);
+                }
             },
             error: function () {
                 //showErrorToast("Something went wrong. Please try again");

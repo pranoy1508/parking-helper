@@ -36,7 +36,7 @@ router.get("/parking/getAvailability", Auth, parkingController.getAvailabilityVi
 
 router.post("/admin/add_excel_users", Auth, userController.addUsersViaExcel);
 router.get("/admin/export_user_details", Auth, adminController.exportUserLogs);
-router.post("/admin/cancel_reservation", Auth, adminController.cancelParkingRequest);
+router.post("/admin/cancel_reservation", Auth, adminController.cancelReservationRequest);
 router.post("/parking/check_in_guest", Auth, parkingController.checkInGuest);
 router.get("/admin/search",Auth,adminController.searchReservation);
 router.get("/admin/search_user",Auth,userController.getUserDetailsByUserName);

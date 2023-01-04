@@ -87,6 +87,7 @@ const addParkingLogs = asyncHandler(async (req, res) => {
         parkingLog.createdBy = req.session.users_id.userName;
         parkingLog.ownerName = parkingDetails.empName;
         parkingLog.ownerId = parkingDetails.empId;
+        parkingLog.linkedReservationId=null;
         if (!parkingLog.vehicleNumber || parkingLog.vehicleNumber == "" || parkingLog.vehicleNumber == " ") {
             return res.json({
                 statusCode: 4021,

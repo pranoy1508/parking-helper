@@ -90,7 +90,8 @@ const exportParkingLogs = asyncHandler(async (req, res) => {
         { header: "Vehicle Type", key: "vehicleType", width: 20 },
         { header: "Vehicle Number", key: "vehicleNumber", width: 20 },
         { header: "RFID", key: "rfid", width: 20 },
-        { header: "In Time", key: "inTime", width: 50 }
+        { header: "In Time", key: "inTime", width: 50 },
+        { header: "Linked Reservation Id", key: "linkedReserveId", width: 50 }
     ];
     const itemCollection = await getExcelItemCollection(allParkingLists, officeDetails);
     worksheet.addRows(itemCollection);
@@ -125,7 +126,7 @@ const submitReservationRequest = asyncHandler(async (req, res) => {
                 message: `All parking spaces are full for ${reservationReq.reservationDate}`
             });
         }
-        const parkingLogResponse = await createReservationParkingLog(reservationReq, req.session.users_id.userName);
+        const parkingLogResponse = await createReservationParkingLog(reservationReq, req.session.users_id.userName, reservationRequest.uniqueId);
         if (parkingLogResponse == true) {
             const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
             if (reservationLogResponse) {
@@ -186,7 +187,7 @@ const exportUserLogs = asyncHandler(async (req, res) => {
 
 });
 
-const cancelParkingRequest=asyncHandler(async(req,res)=>{
+const cancelReservationRequest=asyncHandler(async(req,res)=>{
     const {id} = req.body;
     const reservationRequestDetails=await mongoMiddleware.GetReservationDetailsById(id);
     const officeDetailsList=await mongoMiddleware.GetFullOfficeLocations();
@@ -203,10 +204,8 @@ const cancelParkingRequest=asyncHandler(async(req,res)=>{
             });
         }
     });
-    const startDate = `${reservationRequestDetails.reservationDate}T00:00:00`;
-    const endDate = `${reservationRequestDetails.reservationDate}T23:59:59`;
     await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, id,"CANCELLED");
-    await mongoMiddleware.RemoveParkingDetails(reservationRequestDetails.guestName, startDate,endDate, reservationRequestDetails.locationId);
+    await mongoMiddleware.RemoveParkingDetails(reservationRequestDetails.uniqueId,reservationRequestDetails.locationId);
     const adminDetails = await UserModel.find({ userRole: "ADMIN" });
     const adminList = adminDetails.map(function ($u) { return $u["userName"]; }).join(',');
     const emailSubject = process.env.CANCELLED_EMAIL_SUBJECT.replace('$date', reservationRequestDetails.reservationDate).replace("$requestId", reservationRequestDetails.uniqueId);
@@ -221,6 +220,10 @@ const cancelParkingRequest=asyncHandler(async(req,res)=>{
 const searchReservation=asyncHandler(async(req,res)=>{
     const reservationId = req.query.id;
     let reservationDetails = await mongoMiddleware.GetReservationDetailsByUniqueId(reservationId);
+    if (!reservationDetails)
+    {
+        return res.json(`404: No record found for ${reservationId}`); 
+    }
     const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     const linkedOffice = _.find(officeDetails, (office) => {
         if (office.ParkingLocations) {
@@ -265,7 +268,8 @@ async function getExcelItemCollection(allParkingLists, officeDetails) {
                 })
             }
         });
-        excelData.push(item);
+        item.linkedReserveId = p.linkedReservationId;
+        excelData.push(item);;
     });
     return excelData;
 }
@@ -278,7 +282,7 @@ async function getExcelUserData(allUsersData, officeDetails) {
     return allUsersData;
 }
 
-async function createReservationParkingLog(reservationReq, userName) {
+async function createReservationParkingLog(reservationReq, userName,reserveId) {
     let parkingLogged = false;
     const locationDetails = await mongoMiddleware.GetParkingDetails(reservationReq.locationId);
     const startDate = `${reservationReq.reservationDate}T00:00:00`;
@@ -296,6 +300,7 @@ async function createReservationParkingLog(reservationReq, userName) {
             parkingLog.createdBy = userName;
             parkingLog.ownerName = reservationReq.empName && reservationReq.empName.trim() != "" ? reservationReq.empName : `Guest_${idx}`;
             parkingLog.ownerId = "N/A";
+            parkingLog.linkedReservationId = reserveId;
             await ParkingLogs.create(parkingLog);
             parkingLogged = true;
         }
@@ -321,4 +326,4 @@ async function isReservationAllowed(reservationReq) {
 
 
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, exportParkingLogs, submitReservationRequest, exportUserLogs, cancelParkingRequest, searchReservation };
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, exportParkingLogs, submitReservationRequest, exportUserLogs,  cancelReservationRequest, searchReservation };
