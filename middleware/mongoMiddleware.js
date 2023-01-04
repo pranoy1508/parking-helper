@@ -379,3 +379,45 @@ module.exports.GetAllUsersByType = async (_type) => {
     }
     return userDetails;
 }
+
+module.exports.CreateImportHistory=async(history)=>{
+    let importHistoryResults = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        importHistoryResults = await dbo.collection(process.env.IMPORT_HISTORY_COLLECTION_NAME).insert(history);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return importHistoryResults;
+}
+
+module.exports.GetImportHistoryByUser=async(userName,_limit)=>{
+    let importHistoryResults = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        importHistoryResults = await dbo.collection(process.env.IMPORT_HISTORY_COLLECTION_NAME).find({ "ownerName": userName }).limit(_limit).sort({_id:-1}).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return importHistoryResults;
+}
+
+module.exports.GetImportHistoryById = async (historyId) => {
+    let importHistoryResults = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        importHistoryResults = await dbo.collection(process.env.IMPORT_HISTORY_COLLECTION_NAME).findOne({ "_id": new ObjectId(historyId) });
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return importHistoryResults;
+}

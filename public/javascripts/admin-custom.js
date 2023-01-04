@@ -27,8 +27,7 @@ function clearView(control) {
     }
 }
 
-function searchUserByEmail()
-{
+function searchUserByEmail() {
     const userName = $("#txtSearchReqUser").val();
     if (userName.trim() == "") {
         userName.reload();
@@ -49,4 +48,9 @@ function searchUserByEmail()
             },
         });
     }
+}
+
+function exportImportHistory(historyId) {
+    const excelUrl = `/admin/exportImportHistory?id=${historyId}`;
+    window.open(excelUrl);
 }

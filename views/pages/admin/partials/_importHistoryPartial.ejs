@@ -1,0 +1,34 @@
+<thead style="font-weight: bold;">
+    <td>Import Id</td>
+    <td>Owner Name</td>
+    <td>Added Users Count</td>
+    <td>Removed Users Count</td>
+    <td>Created At</td>
+    <td>Action</td>
+</thead>
+<tbody>
+    <% if(items.importHistory && (items.importHistory).length>0){ items.importHistory.forEach(function
+        (res){ %>
+        <tr>
+            <td class="font-weight-bold">
+                <%= res._id %>
+            </td>
+            <td class="font-weight-bold">
+                <%= res.ownerName %>
+            </td>
+            <td>
+                <%= res.addedUsers.length %>
+            </td>
+            <td>
+                <%= res.removedUsers.length %>
+            </td>
+            <td>
+                <%= res.createdDate.toISOString() %>
+            </td>
+            <td>
+                <a onclick="exportImportHistory('<%=res._id%>')"><i
+                        class="ti-arrow-down" style="cursor:pointer;color:blue">Export</i></a>
+            </td>
+        </tr>
+        <%})} %>
+</tbody>

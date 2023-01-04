@@ -36,6 +36,7 @@ const onLoad = asyncHandler(async (req, res) => {
     loadDetails.userRole = req.session.users_id.userRole;
     loadDetails.userName = req.session.users_id.userName;
     loadDetails.officeData = fullDetails;
+    loadDetails.importHistory = await mongoMiddleware.GetImportHistoryByUser(req.session.users_id.userName,5);
     res.render("pages/admin/index", {
         items: loadDetails,
         groupName: "admin"

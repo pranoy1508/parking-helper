@@ -3,7 +3,9 @@ const mongoMiddleware = require("../middleware/mongoMiddleware");
 const UserModel = require("../models/user.js");
 const passwordGen = require("generate-password");
 const _ = require("lodash-contrib");
-const emailMiddleware=require("../middleware/emailMiddleware");
+const emailMiddleware = require("../middleware/emailMiddleware");
+const ImportHistory = require('../models/importHistory');
+const excelJs = require("exceljs");
 
 const getAllUserDetails = asyncHandler(async (req, res) => {
     const userDetails = await mongoMiddleware.GetAllUsers();
@@ -27,7 +29,7 @@ const addUser = asyncHandler(async (req, res) => {
                 let user = {};
                 user.userName = userDetails.userName;
                 user.userRole = userDetails.role;
-                user.createdDate=new Date();
+                user.createdDate = new Date();
                 user.userPassword = passwordGen.generate({
                     length: 10,
                     numbers: true,
@@ -70,7 +72,7 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
                     let $user = {
                         userName: row[0],
                         userRole: row[2] ? row[2].toUpperCase() : "USER",
-                        userPassword: passwordGen.generate({
+                        userPassword: (existingUser) ? existingUser.userPassword : passwordGen.generate({
                             length: 10,
                             numbers: true,
 
@@ -96,19 +98,20 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
                 newUser.userRole = $user.userRole;
                 newUser.userPassword = $user.userPassword;
                 newUser.locationId = $user.locationId;
-                newUser.createdDate=new Date();
+                newUser.createdDate = new Date();
                 await UserModel.create(newUser);
-                const emailBody = await getEmailBodyForUserAddition(await emailMiddleware.GetEmailBodyTemplate("userAddition"),newUser);
+                const emailBody = await getEmailBodyForUserAddition(await emailMiddleware.GetEmailBodyTemplate("userAddition"), newUser);
                 emailMiddleware.TriggerEmail(newUser.userName, `Welcome to ParkWhiz`, emailBody);
             }
         }
-
         if (removedUserList.length > 0) {
             for (const $user of removedUserList) {
                 await UserModel.deleteOne({ userName: $user.userName });
                 await mongoMiddleware.RemoveVehicleDetailsByUserName($user.userName);
             }
         }
+        const history = new ImportHistory(req.session.users_id.userName, parseInt(input.count), addedUserList, removedUserList);
+        await mongoMiddleware.CreateImportHistory(history);
         return res.json({
             statusCode: 200,
             message: `Users Updated Properly. Added Users Count : ${addedUserList.length} | Removed Users Count : ${removedUserList.length}`
@@ -116,18 +119,44 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
     }
 });
 
-const getUserDetailsByUserName=asyncHandler(async(req,res)=>{
+const getUserDetailsByUserName = asyncHandler(async (req, res) => {
     const userDetails = await UserModel.findOne({ userName: req.query.user });
-    if(!userDetails)
-    {
+    if (!userDetails) {
         return res.json(`<p><h5 style="font-weight:bold;color:red">No user found for ${req.query.user}</h5></p>`);
     }
-    let result={};
+    let result = {};
     result.userDetails = [userDetails];
     res.render("pages/admin/partials/_userViewPartial", {
         items: result,
         groupName: "admin",
         layout: false
+    });
+});
+
+const exportImportHistory = asyncHandler(async (req, res) => {
+    const historyId = req.query.id;
+    let importHistory = await mongoMiddleware.GetImportHistoryById(historyId);
+    const workbook = new excelJs.Workbook();
+    const worksheet = workbook.addWorksheet("ImportHistory");
+
+    worksheet.columns = [
+        { header: "UserName", key: "userName", width: 20 },
+        { header: "Password", key: "userPassword", width: 20 },
+        { header: "Role", key: "userRole", width: 20 },
+        { header: "Action", key: "action", width: 20 },
+    ];
+    const historyCollection = await getExcelHistoryData(importHistory);
+    worksheet.addRows(historyCollection);
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + `Import_${historyId}.xlsx`
+    );
+    return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
     });
 });
 
@@ -141,5 +170,16 @@ async function getEmailBodyForUserAddition(template, newUser) {
     return template.replace("$user", newUser.userName).replace("$pwd", newUser.userPassword).replace("$userName", newUser.userName);
 }
 
+async function getExcelHistoryData(importHistory) {
+    let excelData = [];
+    importHistory.addedUsers.forEach(p => {
+        excelData.push(p);
+    });
+    importHistory.removedUsers.forEach(p => {
+        excelData.push(p);
+    });
+    return excelData;
+}
 
-module.exports = { getAllUserDetails, addUser, addUsersViaExcel, getUserDetailsByUserName };
+
+module.exports = { getAllUserDetails, addUser, addUsersViaExcel, getUserDetailsByUserName, exportImportHistory };
