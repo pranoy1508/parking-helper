@@ -27,6 +27,7 @@ const addUser = asyncHandler(async (req, res) => {
                 let user = {};
                 user.userName = userDetails.userName;
                 user.userRole = userDetails.role;
+                user.createdDate=new Date();
                 user.userPassword = passwordGen.generate({
                     length: 10,
                     numbers: true,
@@ -95,6 +96,7 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
                 newUser.userRole = $user.userRole;
                 newUser.userPassword = $user.userPassword;
                 newUser.locationId = $user.locationId;
+                newUser.createdDate=new Date();
                 await UserModel.create(newUser);
                 const emailBody = await getEmailBodyForUserAddition(await emailMiddleware.GetEmailBodyTemplate("userAddition"),newUser);
                 emailMiddleware.TriggerEmail(newUser.userName, `Welcome to ParkWhiz`, emailBody);

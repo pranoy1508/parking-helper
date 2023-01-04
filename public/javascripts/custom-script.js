@@ -466,10 +466,10 @@ function addUserFromExcel() {
                     result.UserLogs[i].forEach(x => {
                         tempIt.push(x);
                     });
-                }
-                payLoad.temp.push(tempIt);
+                    payLoad.temp.push(tempIt);
+                }                
             }
-            console.log(payLoad);
+            //console.log(payLoad);
             $.ajax({
                 type: "POST",
                 method: "POST",
