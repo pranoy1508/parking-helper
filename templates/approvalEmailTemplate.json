@@ -18,5 +18,9 @@
     {
         "emailType":"guestCheckIn",
         "template":"<h3>Hello Admin,</h3><p>Your guest for the day <span style='color:darkblue;font-weight:bold ;'>$guest</span> has checked in at <b style='color:red;'>$office - $location</b> on <b>$date.</b></p><br /><p style='color: burlywood;font-weight: bold;'>Regards,</p><p style='color: rebeccapurple;font-weight: bold;'>Park Whiz Team</p><p style='color: blue;font-weight: bold;'>LTIMindtree</p>"
+    },
+    {
+        "emailType":"importEmail",
+        "template":"<h3>Hello Admin,</h3><p>A fresh set of Users has been updated by : <span style='color:darkblue;font-weight:bold ;'>$user</span> on <b>$date.</b></p> <br><br> <p>The Imported Details are as follows :</p><br><table border='1'><tr><td><span style='color:darkblue;font-weight:bold ;'>Import Id : </span></td><td><span style='color:red;font-weight:bold ;'>$importId</span></td></tr><tr><td><span style='color:darkblue;font-weight:bold ;'>Added Users Count : </span></td><td><span style='color:red;font-weight:bold ;'>$addCount</span></td></tr><tr><td><span style='color:darkblue;font-weight:bold ;'>Removed Users Count : </span></td><td><span style='color:red;font-weight:bold ;'>$remCount</span></td></tr></table><br /><br /><p style='color: burlywood;font-weight: bold;'>Regards,</p><p style='color: rebeccapurple;font-weight: bold;'>Park Whiz Team</p><p style='color: blue;font-weight: bold;'>LTIMindtree</p>"
     }
 ]

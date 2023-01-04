@@ -111,7 +111,10 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
             }
         }
         const history = new ImportHistory(req.session.users_id.userName, parseInt(input.count), addedUserList, removedUserList);
-        await mongoMiddleware.CreateImportHistory(history);
+        const historyAddResult=await mongoMiddleware.CreateImportHistory(history);
+        const adminDetails = await UserModel.find({ userRole: "ADMIN" });
+        const emailBody = await getEmailBodyForImport(await emailMiddleware.GetEmailBodyTemplate("importEmail"), history, historyAddResult.insertedIds[0]._id.toString());
+        emailMiddleware.TriggerEmail(adminDetails.map(function ($u) { return $u["userName"]; }).join(','), `IMPORT : Imported Users Successfully on ${new Date().toISOString().split("T")[0]}`, emailBody);
         return res.json({
             statusCode: 200,
             message: `Users Updated Properly. Added Users Count : ${addedUserList.length} | Removed Users Count : ${removedUserList.length}`
@@ -194,6 +197,10 @@ async function getExcelHistoryData(importHistory) {
         excelData.push(p);
     });
     return excelData;
+}
+
+async function getEmailBodyForImport(template, history,historyId) {
+    return template.replace("$user", history.ownerName).replace("$date", history.createdDate).replace("$importId", historyId).replace("$addCount", history.addedUsers.length).replace("$remCount", history.removedUsers.length);
 }
 
 
