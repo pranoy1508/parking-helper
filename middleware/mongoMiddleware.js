@@ -364,3 +364,18 @@ module.exports.GetReservationDetailsByUniqueId = async (requestId) => {
     }
     return reservationDetails;
 }
+
+
+module.exports.GetAllUsersByType = async (_type) => {
+    let userDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        userDetails = await dbo.collection(process.env.USERS_COLLECTIONS_NAME).find({ "userRole":{$in:_type } }).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return userDetails;
+}

@@ -11,7 +11,7 @@ const ReservationRequest = require("../models/reservationRequest");
 const onLoad = asyncHandler(async (req, res) => {
     const fullDetails = await mongoMiddleware.GetFullOfficeLocations();
     const officeDetails = fullDetails.map(function ($loc) { return $loc["OfficeLocation"]; });
-    const userDetails = await mongoMiddleware.GetAllUsers();
+    const userDetails = await mongoMiddleware.GetAllUsersByType(["ADMIN","SUPPORT"]);
     let reservedDetails = await mongoMiddleware.GetReservationRequestByUserName(req.session.users_id.userName);
     reservedDetails = _.filter(reservedDetails, (res) => { return (new Date(res.reservationDate) >= new Date().setHours(0, 0, 0, 0)) });
     for (let res of reservedDetails) {

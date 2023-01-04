@@ -34,11 +34,11 @@
             <td>
                 <%= res.vehicleType==0 ? "2Wheeler" : "4Wheeler" %>
             </td>
-            <td style="color: darkgreen; font-size: large;font-weight: bold;">
+            <td style="<%= res.status=='CANCELLED'?'color: red; font-size: large;font-weight: bold;' : 'color: darkgreen; font-size: large;font-weight: bold;'%>">
                 <%= res.status %>
             </td>
             <td>
-                <%if(res.isSelfOwned!=null && res.isSelfOwned==false) {%>
+                <%if((res.isSelfOwned!=null && res.isSelfOwned==false) || res.status=='CANCELLED') {%>
                     <button type="button" class="btn btn-danger" disabled>Cancel</button>
                     <%}else{ %>
                         <button type="button" onclick="cancelReservation('<%= res._id  %>')"
