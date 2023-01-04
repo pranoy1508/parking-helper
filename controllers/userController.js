@@ -160,6 +160,21 @@ const exportImportHistory = asyncHandler(async (req, res) => {
     });
 });
 
+const searchViewHistory=asyncHandler(async(req,res)=>{
+    const historyId = req.query.id;
+    let importHistoryRes = await mongoMiddleware.GetImportHistoryById(historyId);
+    if (!importHistoryRes) {
+        return res.json(`<p><h5 style="font-weight:bold;color:red">No record found for ${historyId}</h5></p>`);
+    }
+    let result = {};
+    result.importHistory = [importHistoryRes];
+    res.render("pages/admin/partials/_importHistoryPartial", {
+        items: result,
+        groupName: "admin",
+        layout: false
+    });
+});
+
 async function getLocationId(locationName) {
     const locationDetails = await mongoMiddleware.GetFullOfficeLocations();
     const contextOffice = _.filter(locationDetails, ($loc) => { return $loc.OfficeLocation == locationName.trim() });
@@ -182,4 +197,4 @@ async function getExcelHistoryData(importHistory) {
 }
 
 
-module.exports = { getAllUserDetails, addUser, addUsersViaExcel, getUserDetailsByUserName, exportImportHistory };
+module.exports = { getAllUserDetails, addUser, addUsersViaExcel, getUserDetailsByUserName, exportImportHistory, searchViewHistory };

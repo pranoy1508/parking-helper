@@ -54,3 +54,26 @@ function exportImportHistory(historyId) {
     const excelUrl = `/admin/exportImportHistory?id=${historyId}`;
     window.open(excelUrl);
 }
+
+function searchHistory() {
+    const requestId = $("#txtSearchImportId").val();
+    if (requestId.trim() == "") {
+        location.reload();
+    }
+    else {
+        $.ajax({
+            type: "GET",
+            url: `/admin/searchHistory?id=${requestId}`,
+            cache: false,
+            beforeSend: function () {
+                //showLoadingToast("Adding details...");
+            },
+            success: function (data) {
+                $("#tbl_import_history").html(data);
+            },
+            error: function () {
+                //showErrorToast("Something went wrong. Please try again");
+            },
+        });
+    }
+}

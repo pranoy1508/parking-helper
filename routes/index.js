@@ -41,5 +41,6 @@ router.post("/parking/check_in_guest", Auth, parkingController.checkInGuest);
 router.get("/admin/search",Auth,adminController.searchReservation);
 router.get("/admin/search_user",Auth,userController.getUserDetailsByUserName);
 router.get("/admin/exportImportHistory", Auth, userController.exportImportHistory);
+router.get("/admin/searchHistory",Auth,userController.searchViewHistory);
 
 module.exports = router; 
