@@ -1,0 +1,46 @@
+<thead style="font-weight: bold;">
+    <td>Reservation Id</td>
+    <td>Name</td>
+    <td>Reservation Date</td>
+    <!-- <td>Office Location</td> -->
+    <td>Parking Location</td>
+    <!-- <td>Vehicle Count</td> -->
+    <td>Vehicle Type</td>
+    <td>Status</td>
+    <td>Action</td>
+</thead>
+<tbody>
+    <% if(items.reservedDetails && (items.reservedDetails).length>0){ items.reservedDetails.forEach(function
+        (res){ %>
+        <tr>
+            <td class="font-weight-bold">
+                <%= res.uniqueId %>
+            </td>
+            <td class="font-weight-bold">
+                <%= res.employeeName %>
+            </td>
+            <td>
+                <%= res.reservationDate %>
+            </td>
+            <!-- <td>
+                                <%= res.officeLocation %>
+                            </td> -->
+            <td>
+                <%= res.parkingLocation %>
+            </td>
+            <!-- <td>
+                                <%= res.vehicleCount %>
+                            </td> -->
+            <td>
+                <%= res.vehicleType==0 ? "2Wheeler" : "4Wheeler" %>
+            </td>
+            <td style="color: darkgreen; font-size: large;font-weight: bold;">
+                <%= res.status %>
+            </td>
+            <td>
+                <button type="button" onclick="cancelReservation('<%= res._id  %>')"
+                    class="btn btn-danger">Cancel</button>
+            </td>
+        </tr>
+        <%})} %>
+</tbody>
