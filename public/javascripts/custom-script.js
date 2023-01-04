@@ -84,7 +84,7 @@ function locationSelectionChanged(item) {
 }
 
 function getParkingDetails() {
-    var locationId = $('#parking_location_ddl').val();
+    let locationId = $('#parking_location_ddl').val();
     $.ajax({
         type: "POST",
         url: `/admin/get_location_details`,
@@ -442,26 +442,26 @@ function submitExport() {
 
 
 function addUserFromExcel() {
-    var oFile = document.getElementsByName("input")[0].files[0];
-    var sFilename = oFile.name;
-    var reader = new FileReader();
-    var result = {};
+    let oFile = document.getElementsByName("inputExcel")[0].files[0];
+    let sFilename = oFile.name;
+    let reader = new FileReader();
+    let result = {};
     reader.onload = function (e) {
-        var data = e.target.result;
+        let data = e.target.result;
         data = new Uint8Array(data);
-        var workbook = XLSX.read(data, { type: 'array' });
-        var result = {};
+        let workbook = XLSX.read(data, { type: 'array' });
+        let result = {};
         workbook.SheetNames.forEach(function (sheetName) {
-            var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, defval: "" });
+            let roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, defval: "" });
             if (roa.length) result[sheetName] = roa;
         });
         if (result) {
-            var payLoad = {};
+            let payLoad = {};
             payLoad.temp = [];
-            for (var i = 1; i < result.UserLogs.length; i++) {
+            for (let i = 1; i < result.UserLogs.length; i++) {
 
                 if (result.UserLogs[i].length > 0) {
-                    var tempIt = [];
+                    let tempIt = [];
                     result.UserLogs[i].forEach(x => {
                         tempIt.push(x);
                     });
