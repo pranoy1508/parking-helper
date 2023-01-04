@@ -350,3 +350,17 @@ module.exports.GetReservationDetailsByStatus = async (status,queryDate) => {
     }
     return reservationDetails;
 }
+
+module.exports.GetReservationDetailsByUniqueId = async (requestId) => {
+    let reservationDetails = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        reservationDetails = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).findOne({ "uniqueId": requestId });
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return reservationDetails;
+}

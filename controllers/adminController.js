@@ -216,6 +216,31 @@ const cancelParkingRequest=asyncHandler(async(req,res)=>{
     });
 });
 
+const searchReservation=asyncHandler(async(req,res)=>{
+    const reservationId = req.query.id;
+    let reservationDetails = await mongoMiddleware.GetReservationDetailsByUniqueId(reservationId);
+    const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    const linkedOffice = _.find(officeDetails, (office) => {
+        if (office.ParkingLocations) {
+            const contextParking = _.find(office.ParkingLocations, ($p) => {
+                if ($p.LocationId == reservationDetails.locationId) {
+                    reservationDetails.parkingLocation = $p.LocationName;
+                    return true;
+                }
+            });
+            return contextParking;
+        }
+    });
+    reservationDetails.officeLocation = linkedOffice ? linkedOffice.OfficeLocation : null;
+    reservationDetails.isSelfOwned = reservationDetails.requestedBy == req.session.users_id.userName;
+    const result={};
+    result.reservedDetails = [reservationDetails];
+    res.render("pages/admin/partials/_requestViewPartial", {
+        items: result,
+        groupName: "admin",
+        layout: false
+    });
+});
 
 async function getExcelItemCollection(allParkingLists, officeDetails) {
     let excelData = [];
@@ -294,4 +319,4 @@ async function isReservationAllowed(reservationReq) {
 
 
 
-module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, exportParkingLogs, submitReservationRequest, exportUserLogs, cancelParkingRequest };
+module.exports = { onLoad, getParkingLocationsByOffice, getParkingDetails, updateLocationDetails, exportParkingLogs, submitReservationRequest, exportUserLogs, cancelParkingRequest, searchReservation };

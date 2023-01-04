@@ -38,8 +38,13 @@
                 <%= res.status %>
             </td>
             <td>
-                <button type="button" onclick="cancelReservation('<%= res._id  %>')"
-                    class="btn btn-danger">Cancel</button>
+                <%if(res.isSelfOwned!=null && res.isSelfOwned==false) {%>
+                    <button type="button" class="btn btn-danger" disabled>Cancel</button>
+                    <%}else{ %>
+                        <button type="button" onclick="cancelReservation('<%= res._id  %>')"
+                            class="btn btn-danger">Cancel</button>
+                        <% }%>
+
             </td>
         </tr>
         <%})} %>
