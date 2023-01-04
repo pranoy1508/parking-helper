@@ -13,7 +13,7 @@ const onLoad = asyncHandler(async (req, res) => {
     const officeDetails = fullDetails.map(function ($loc) { return $loc["OfficeLocation"]; });
     const userDetails = await mongoMiddleware.GetAllUsers();
     let reservedDetails = await mongoMiddleware.GetReservationRequestByUserName(req.session.users_id.userName);
-    reservedDetails = _.filter(reservedDetails, (res) => { return (new Date(res.reservationDate)>=new Date()) });
+    reservedDetails = _.filter(reservedDetails, (res) => { return (new Date(res.reservationDate) >= new Date().setHours(0, 0, 0, 0)) });
     for (let res of reservedDetails) {
         const linkedOffice = _.find(fullDetails, (office) => {
             if (office.ParkingLocations) {
@@ -108,14 +108,21 @@ const exportParkingLogs = asyncHandler(async (req, res) => {
 const submitReservationRequest = asyncHandler(async (req, res) => {
     if (req.session.users_id.userRole == "ADMIN") {
         const reservationReq = req.body;
-        if (new Date(reservationReq.reservationDate) < new Date()) {
-            res.json({
+        if (new Date(reservationReq.reservationDate) < new Date().setHours(0, 0, 0, 0)) {
+            return res.json({
                 statusCode: 402,
                 message: `Operation Not Allowed for Past Dates`
             });
         }
-
         const reservationRequest = new ReservationRequest(reservationReq.locationId, reservationReq.empName, reservationReq.vehicleType, reservationReq.vehicleCount, reservationReq.reservationDate, new Date(), req.session.users_id.userName);
+        const isReservationAllowedRes = await isReservationAllowed(reservationRequest);
+        if (!isReservationAllowedRes)
+        {
+            return res.json({
+                statusCode: 402,
+                message: `All parking spaces are full for ${reservationReq.reservationDate}`
+            });
+        }
         const parkingLogResponse = await createReservationParkingLog(reservationReq, req.session.users_id.userName);
         if (parkingLogResponse == true) {
             const reservationLogResponse = await mongoMiddleware.CreateParkingReservation(reservationRequest);
@@ -271,6 +278,16 @@ async function createReservationParkingLog(reservationReq, userName) {
 
 async function getReservationEmailBody(template, reservationRequest, payload) {
     return template.replace('$date', reservationRequest.createdDate).replace('$requestorName', reservationRequest.requestedBy).replace('$office', payload.officeLocation).replace('$location', payload.location).replace("$requestId", reservationRequest.uniqueId).replace("$resDate", reservationRequest.reservationDate).replace("$vType", reservationRequest.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler").replace("$count", reservationRequest.vehicleCount);
+}
+
+async function isReservationAllowed(reservationReq) {
+    const sysDate = new Date().toISOString().split('T')[0];
+    const startDate = `${sysDate}T00:00:00`;
+    const endDate = `${sysDate}T23:59:59`;
+    const locationDetails = await mongoMiddleware.GetParkingDetails(reservationReq.locationId);
+    const bookedCount = await mongoMiddleware.GetVehicleCountByType(reservationReq.vehicleType, reservationReq.locationId, startDate, endDate);
+    const totalCount = reservationReq.vehicleType == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
+    return (totalCount - bookedCount >0);
 }
 
 
