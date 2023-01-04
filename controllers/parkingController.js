@@ -47,6 +47,7 @@ const onLoad = asyncHandler(async (req, res) => {
     responseDetails.vehicleDetails = vehicleDetails;
     responseDetails.reservations = reservationResponse;
     responseDetails.userRole = req.session.users_id.userRole;
+    responseDetails.userName = req.session.users_id.userName;
     res.render("pages/security/index", {
         items: responseDetails,
         groupName: "security"

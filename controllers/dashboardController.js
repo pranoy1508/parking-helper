@@ -56,6 +56,7 @@ const onLoad = asyncHandler(async (req, res) => {
     returnResponse.vehicleInfo = vehicleInfo;
     returnResponse.officeDetails = officeDetails;
     returnResponse.userRole = req.session.users_id.userRole;
+    returnResponse.userName = req.session.users_id.userName;
     res.render("pages/users/index", {
         items: returnResponse,
         groupName: "users"

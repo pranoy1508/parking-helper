@@ -34,6 +34,7 @@ const onLoad = asyncHandler(async (req, res) => {
     loadDetails.userDetails = userDetails;
     loadDetails.reservedDetails = reservedDetails;
     loadDetails.userRole = req.session.users_id.userRole;
+    loadDetails.userName = req.session.users_id.userName;
     loadDetails.officeData = fullDetails;
     res.render("pages/admin/index", {
         items: loadDetails,
