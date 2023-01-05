@@ -8,7 +8,7 @@ const UserModel = require("../models/user.js");
 const onLoad = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     const sysDate = new Date().toISOString().split('T')[0];
-    officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
+    officeDetails = req.session.users_id.locationId ? _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId }) : officeDetails;
     const vehicleDetails = await mongoMiddleware.GetAllVehicleInformation();
     let reservationResponse = await mongoMiddleware.GetReservationDetailsByStatus("BOOKED", sysDate);
     const startDate = `${sysDate}T00:00:00`;
