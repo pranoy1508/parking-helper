@@ -101,7 +101,7 @@ const addUsersViaExcel = asyncHandler(async (req, res) => {
                 newUser.createdDate = new Date();
                 await UserModel.create(newUser);
                 const emailBody = await getEmailBodyForUserAddition(await emailMiddleware.GetEmailBodyTemplate("userAddition"), newUser);
-                emailMiddleware.TriggerEmail(newUser.userName, `Welcome to ParkWhiz`, emailBody);
+                emailMiddleware.TriggerEmail(newUser.userName, `Welcome to ParQWhiz`, emailBody);
             }
         }
         if (removedUserList.length > 0) {
