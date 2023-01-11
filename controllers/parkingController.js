@@ -128,6 +128,7 @@ const addParkingLogs = asyncHandler(async (req, res) => {
 
 const getAvailabilityView = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
+    if (!officeDetails || !req.session.users_id){return `No Details Found. Please Re-Login`};
     officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
     const sysDate = new Date().toISOString().split('T')[0];
     const startDate = `${sysDate}T00:00:00`;
@@ -186,6 +187,24 @@ const checkInGuest = asyncHandler(async (req, res) => {
     });
 });
 
+const getCheckOutDetailsByVehicleNumber=asyncHandler(async(req,res)=>{
+    const vehicleNumber = req.query.v_no;
+    const parkingLogDetails = await mongoMiddleware.GetParkingLogsByVehicleNumber(vehicleNumber, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
+    res.render("pages/security/partials/_checkout", {
+        parkingLog: parkingLogDetails[0],
+        groupName: "security",
+        layout: false
+    });
+});
+
+const checkOutParking=asyncHandler(async(req,res)=>{
+    const {call_id} =req.body;
+    await mongoMiddleware.CheckOutParkingLogsById(call_id);
+    return res.json({
+        statusCode: 200,
+        message: `Successfully Checked out ${call_id}`,
+    });
+});
 
 async function getCheckInEmailBody(templateStr, reservationDetails) {
     return templateStr.replace("$guest", reservationDetails.guestName).replace("$date", new Date().toISOString().split(".")[0]).replace("$office", reservationDetails.officeLocation).replace("$location", reservationDetails.parkingLocation);
@@ -200,4 +219,4 @@ async function isValidVehicle(vehicleDetails, parkingDetails) {
     return false;
 }
 
-module.exports = { onLoad, addParkingLogs, getAvailabilityView, checkInGuest };
+module.exports = { onLoad, addParkingLogs, getAvailabilityView, checkInGuest, getCheckOutDetailsByVehicleNumber, checkOutParking };

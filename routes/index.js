@@ -42,5 +42,7 @@ router.get("/admin/search",Auth,adminController.searchReservation);
 router.get("/admin/search_user",Auth,userController.getUserDetailsByUserName);
 router.get("/admin/exportImportHistory", Auth, userController.exportImportHistory);
 router.get("/admin/searchHistory",Auth,userController.searchViewHistory);
+router.get("/parking/getCheckOutDetailsByVehicleNumber", Auth, parkingController.getCheckOutDetailsByVehicleNumber);
+router.post("/parking/check_out_parking",Auth,parkingController.checkOutParking);
 
 module.exports = router; 

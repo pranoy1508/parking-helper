@@ -1,0 +1,32 @@
+<tr style="font-weight: bold;">
+    <th>Vehicle Number</th>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Linked RFID Card</th>
+    <th>Check-In Time</th>
+    <th></th>
+</tr>
+<% if(parkingLog){ %>
+<tr style="background-color:#F7F59B">
+    <td style="font-weight: bold;color:darkgreen">
+        <%= parkingLog.vehicleNumber %>
+    </td>
+    <td>
+        <%= parkingLog.ownerId %>
+    </td>
+    <td>
+        <%= parkingLog.ownerName %>
+    </td>
+    <td>
+        <%= parkingLog.linkedRfidCard %>
+    </td>
+    <td style="font-weight: bold;color:darkgreen">
+        <%= parkingLog.checkInTime %>
+    </td>
+    <td>
+        <button type="button" onclick="checkOut('<%= parkingLog._id %>')" class="btn btn-danger" name="btnCheckOutSup">Check-Out</button>
+    </td>
+</tr>
+<%} else {%>
+    <tr>No Details Found..</tr>
+    <% }%>

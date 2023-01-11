@@ -7,10 +7,13 @@
                     <!-- Tabs Navigations -->
                     <ul class="nav nav-tabs" role="tablist" id="support_nav_tab">
                         <li class="nav-item active "><a href="#parkingDetails" role="tab" data-toggle="tab"
-                                class="nav-link active fa fa-cog"> Parking Data</a>
+                                class="nav-link active fa fa-car"> Parking Data</a>
                         </li>
-                        <li class="nav-item"><a href="#checkIn" role="tab" data-toggle="tab" class="nav-link fa fa-cog">
+                        <li class="nav-item"><a href="#checkIn" role="tab" data-toggle="tab" class="nav-link fa fa-bell">
                                 Check-In</a>
+                        </li>
+                        <li class="nav-item"><a href="#checkOut" role="tab" data-toggle="tab" class="nav-link fa fa-bell-slash">
+                                Check-Out</a>
                         </li>
                     </ul>
                     <!-- Tabs Navigations -->
@@ -23,6 +26,9 @@
                         </div>
                         <div class="tab-pane container fade" id="checkIn">
                             <%- include('partials/_checkInPartials.ejs') %>
+                        </div>
+                        <div class="tab-pane container fade" id="checkOut">
+                            <%- include('partials/_checkOutPartials.ejs') %>
                         </div>
                     </div>
                 </div>

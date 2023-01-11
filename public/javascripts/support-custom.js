@@ -64,3 +64,48 @@ function checkInGuest(reservationId) {
         },
     });
 }
+
+function getCheckOutDetails() {
+    const inputVehicleNumber = $("#txt_vehicleName_srch").val();
+    $.ajax({
+        type: "GET",
+        url: `/parking/getCheckOutDetailsByVehicleNumber?v_no=${inputVehicleNumber.trim()}`,
+        cache: false,
+        beforeSend: function () {
+            //showLoadingToast("Adding details...");
+        },
+        success: function (data) {
+            $("#tbl_check_out_support").html(data);
+        },
+        error: function () {
+            //showErrorToast("Something went wrong. Please try again");
+        },
+    });
+}
+
+function checkOut(id) {
+    $.ajax({
+        type: "POST",
+        url: `/parking/check_out_parking`,
+        cache: false,
+        data: { "call_id": id },
+        dataType: "json",
+        beforeSend: function () {
+            //showLoadingToast("Registering...");
+        },
+        success: function (data) {
+            if (data.statusCode == 2021) {
+                showErrorToast(data.message);
+            }
+            else {
+                showSuccessToast(data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
+}

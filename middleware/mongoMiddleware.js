@@ -123,12 +123,12 @@ module.exports.GetVehicleCountByType = async (_vehicleType, _locationId, startDa
                 $gte: new Date(startDate),
                 $lte: new Date(endDate)
             },
-            $or:[
+            $or: [
                 {
-                    status:"CHECKED-IN"
+                    status: "CHECKED-IN"
                 },
                 {
-                    status:"RESERVED"
+                    status: "RESERVED"
                 }
             ]
         };
@@ -345,12 +345,12 @@ module.exports.RemoveParkingDetails = async (uniqueId, parkingLocation) => {
     }
 }
 
-module.exports.GetReservationDetailsByStatus = async (status,queryDate) => {
+module.exports.GetReservationDetailsByStatus = async (status, queryDate) => {
     let reservationDetails = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        const query = { "reservationDate": queryDate, "status":status};
+        const query = { "reservationDate": queryDate, "status": status };
         reservationDetails = await dbo.collection(process.env.RESERVATIONS_COLLECTION_NAME).find(query).toArray();
         dbConnection.close();
     }
@@ -379,7 +379,7 @@ module.exports.GetAllUsersByType = async (_type) => {
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        userDetails = await dbo.collection(process.env.USERS_COLLECTIONS_NAME).find({ "userRole":{$in:_type } }).toArray();
+        userDetails = await dbo.collection(process.env.USERS_COLLECTIONS_NAME).find({ "userRole": { $in: _type } }).toArray();
         dbConnection.close();
     }
     catch (exception) {
@@ -388,7 +388,7 @@ module.exports.GetAllUsersByType = async (_type) => {
     return userDetails;
 }
 
-module.exports.CreateImportHistory=async(history)=>{
+module.exports.CreateImportHistory = async (history) => {
     let importHistoryResults = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -402,12 +402,12 @@ module.exports.CreateImportHistory=async(history)=>{
     return importHistoryResults;
 }
 
-module.exports.GetImportHistoryByUser=async(userName,_limit)=>{
+module.exports.GetImportHistoryByUser = async (userName, _limit) => {
     let importHistoryResults = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
         var dbo = dbConnection.db(process.env.DB_NAME);
-        importHistoryResults = await dbo.collection(process.env.IMPORT_HISTORY_COLLECTION_NAME).find({ "ownerName": userName }).limit(_limit).sort({_id:-1}).toArray();
+        importHistoryResults = await dbo.collection(process.env.IMPORT_HISTORY_COLLECTION_NAME).find({ "ownerName": userName }).limit(_limit).sort({ _id: -1 }).toArray();
         dbConnection.close();
     }
     catch (exception) {
@@ -430,7 +430,7 @@ module.exports.GetImportHistoryById = async (historyId) => {
     return importHistoryResults;
 }
 
-module.exports.UpdateRelatedParkingLogs=async(uniqueId,status)=>{
+module.exports.UpdateRelatedParkingLogs = async (uniqueId, status) => {
     let updateResult = null;
     try {
         const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
@@ -441,6 +441,51 @@ module.exports.UpdateRelatedParkingLogs=async(uniqueId,status)=>{
                 $set: {
                     "status": status,
                     "checkInTime": new Date()
+                }
+            }
+        );
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return updateResult;
+}
+
+module.exports.GetParkingLogsByVehicleNumber = async (reqVehicleNumber, startDate, endDate)=>{
+    var result = null;
+    try {
+        const query = {
+            parkingDate:
+            {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            },
+            vehicleNumber: new RegExp(reqVehicleNumber, 'i'),
+            status:"CHECKED-IN"
+        };
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        result = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).find(query).toArray();
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return result;
+}
+
+module.exports.CheckOutParkingLogsById = async (uniqueId) => {
+    let updateResult = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        updateResult = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).updateOne(
+            { "_id": new ObjectId(uniqueId) },
+            {
+                $set: {
+                    "status": "CHECKED-OUT",
+                    "checkOutTime": new Date()
                 }
             }
         );
