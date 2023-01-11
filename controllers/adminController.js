@@ -85,12 +85,13 @@ const exportParkingLogs = asyncHandler(async (req, res) => {
         { header: "Office Name", key: "office", width: 20 },
         { header: "Parking Location", key: "parkingLocation", width: 20 },
         { header: "Date", key: "reqDate", width: 20 },
-        { header: "Emp Id", key: "empId", width: 20 },
-        { header: "Emp Name", key: "empName", width: 20 },
+        { header: "Id", key: "empId", width: 20 },
+        { header: "Name", key: "empName", width: 20 },
         { header: "Vehicle Type", key: "vehicleType", width: 20 },
         { header: "Vehicle Number", key: "vehicleNumber", width: 20 },
         { header: "RFID", key: "rfid", width: 20 },
-        { header: "In Time", key: "inTime", width: 50 },
+        { header: "Check In Time", key: "inTime", width: 50 },
+        { header: "Check Out Time", key: "outTime", width: 50 },
         { header: "Linked Reservation Id", key: "linkedReserveId", width: 50 }
     ];
     const itemCollection = await getExcelItemCollection(allParkingLists, officeDetails);
@@ -257,7 +258,8 @@ async function getExcelItemCollection(allParkingLists, officeDetails) {
         item.vehicleType = p.vehicleType == 0 ? "2 Wheeler" : "4 Wheeler";
         item.vehicleNumber = p.vehicleNumber;
         item.rfid = p.linkedRfidCard;
-        item.inTime = p.parkingDate.toISOString().split("T")[1];
+        item.inTime = p.checkInTime;
+        item.outTime = p.checkOutTime;
         officeDetails.forEach(x => {
             if (x.ParkingLocations) {
                 x.ParkingLocations.forEach(t => {

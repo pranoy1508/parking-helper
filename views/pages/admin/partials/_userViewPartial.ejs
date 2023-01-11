@@ -2,7 +2,6 @@
     <tr>
         <th>Sl. No.</th>
         <th>UserName</th>
-        <th>Password</th>
         <th>Role</th>
         <th>Created Date</th>
     </tr>
@@ -17,8 +16,6 @@
                 </td>
                 <td><input type="text" class="form-control" value="<%= user.userName %>" name="userName"
                         placeholder="User Name" readonly /></td>
-                <td><input type="text" class="form-control" value="<%= user.userPassword %>" name="password"
-                        placeholder="Password" readonly /></td>
                 <td><input type="text" class="form-control" value="<%= user.userRole %>" name="Role"
                         placeholder="User Role" readonly /></td>
                 <td><input type="text" class="form-control" value="<%= user.createdDate.toISOString() %>" name="Role"
