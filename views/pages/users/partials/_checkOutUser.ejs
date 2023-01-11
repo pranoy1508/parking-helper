@@ -1,0 +1,43 @@
+<br>
+<br>
+<h5>
+    Check Out for the day :
+</h5>
+<br />
+<% if(items.parkingLog){ %>
+    <table id="tbl_check_out_user" class="table table-striped table-bordered" style="width:100%">
+        <tr style="font-weight: bold;">
+            <th>Vehicle Number</th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Linked RFID Card</th>
+            <th>Check-In Time</th>
+            <th></th>
+        </tr>
+        <tr style="background-color:#F7F59B">
+            <td style="font-weight: bold;color:darkgreen">
+                <%= items.parkingLog.vehicleNumber %>
+            </td>
+            <td>
+                <%= items.parkingLog.ownerId %>
+            </td>
+            <td>
+                <%= items.parkingLog.ownerName %>
+            </td>
+            <td>
+                <%= items.parkingLog.linkedRfidCard %>
+            </td>
+            <td style="font-weight: bold;color:darkgreen">
+                <%= items.parkingLog.checkInTime %>
+            </td>
+            <td>
+                <button type="button" onclick="checkOut('<%= items.parkingLog._id %>')" class="btn btn-danger"
+                    name="btnCheckOutSup">Check-Out</button>
+            </td>
+        </tr>
+
+    </table>
+    <%} else {%>
+        <h3 style="color: red;"> <i class="fa-sharp fa-solid fa-triangle-exclamation"></i> &nbsp;No Details Found.
+        </h3>
+        <% }%>

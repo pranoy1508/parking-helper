@@ -496,3 +496,26 @@ module.exports.CheckOutParkingLogsById = async (uniqueId) => {
     }
     return updateResult;
 }
+
+module.exports.GetPendingParkingLogByUserName = async (userName, startDate, endDate) => {
+    var result = null;
+    try {
+        const query = {
+            parkingDate:
+            {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            },
+            ownerName: userName,
+            status: "CHECKED-IN"
+        };
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        result = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).findOne(query);
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return result;
+}

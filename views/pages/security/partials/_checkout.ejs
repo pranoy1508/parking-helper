@@ -1,3 +1,4 @@
+<% if(parkingLog){ %>
 <tr style="font-weight: bold;">
     <th>Vehicle Number</th>
     <th>Id</th>
@@ -6,7 +7,6 @@
     <th>Check-In Time</th>
     <th></th>
 </tr>
-<% if(parkingLog){ %>
 <tr style="background-color:#F7F59B">
     <td style="font-weight: bold;color:darkgreen">
         <%= parkingLog.vehicleNumber %>
@@ -28,5 +28,5 @@
     </td>
 </tr>
 <%} else {%>
-    <tr>No Details Found..</tr>
+    <h3 style="color: red;"> <i class="fa-sharp fa-solid fa-triangle-exclamation"></i> &nbsp;No Details Found.</h3>
     <% }%>

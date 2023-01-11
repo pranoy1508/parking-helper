@@ -1,43 +1,23 @@
 function availableParkingLocationChanged(items) {
-    const officeDetails = JSON.parse(items);
     const parkingLocationId = $("#parking_location_ddl_usr").val();
-    const officeLocation = $("#location_ddl_sec").val();
     const dateForExtraction = $('#parkingInfoDate').val();
-    if (dateForExtraction==new Date().toISOString().split("T")[0])
-    {
-        let contextLocationDetails = null;
-        officeDetails.forEach(loc => {
-            if (loc.OfficeLocation == officeLocation && loc.ParkingLocations && loc.ParkingLocations.length > 0) {
-                loc.ParkingLocations.forEach($opt => {
-                    if ($opt.LocationId == parkingLocationId) {
-                        contextLocationDetails = $opt;
-                    }
-                });
-            }
-        });
-        updateParkingInfoView(contextLocationDetails);
-    }
-    else 
-    {
-        $.ajax({
-            type: "POST",
-            url: `/dashboard/get_availability`,
-            cache: false,
-            data: { "locationId": parkingLocationId, "requestedData": dateForExtraction },
-            dataType: "json",
-            beforeSend: function () {
-                showLoadingToast("Getting Location details...");
-            },
-            success: function (data) {
-                showSuccessToast("Success");
-                updateParkingInfoView(data);
-            },
-            error: function () {
-                showErrorToast("Something went wrong. Please try again");
-            },
-        });
-    }
-
+    $.ajax({
+        type: "POST",
+        url: `/dashboard/get_availability`,
+        cache: false,
+        data: { "locationId": parkingLocationId, "requestedData": dateForExtraction },
+        dataType: "json",
+        beforeSend: function () {
+            showLoadingToast("Getting Location details...");
+        },
+        success: function (data) {
+            showSuccessToast("Success");
+            updateParkingInfoView(data);
+        },
+        error: function () {
+            showErrorToast("Something went wrong. Please try again");
+        },
+    });
 }
 
 function getParkingInfoTemplate(item, typeOfVehicle) {

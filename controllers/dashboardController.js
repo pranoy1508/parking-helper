@@ -54,6 +54,7 @@ const onLoad = asyncHandler(async (req, res) => {
     returnResponse.officeDetails = officeDetails;
     returnResponse.userRole = req.session.users_id.userRole;
     returnResponse.userName = req.session.users_id.userName;
+    returnResponse.parkingLog = await mongoMiddleware.GetPendingParkingLogByUserName(req.session.users_id.userName, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
     res.render("pages/users/index", {
         items: returnResponse,
         groupName: "users"

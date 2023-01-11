@@ -82,30 +82,3 @@ function getCheckOutDetails() {
         },
     });
 }
-
-function checkOut(id) {
-    $.ajax({
-        type: "POST",
-        url: `/parking/check_out_parking`,
-        cache: false,
-        data: { "call_id": id },
-        dataType: "json",
-        beforeSend: function () {
-            //showLoadingToast("Registering...");
-        },
-        success: function (data) {
-            if (data.statusCode == 2021) {
-                showErrorToast(data.message);
-            }
-            else {
-                showSuccessToast(data.message);
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
-            }
-        },
-        error: function () {
-            showErrorToast("Something went wrong. Please try again");
-        },
-    });
-}

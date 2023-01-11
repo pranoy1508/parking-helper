@@ -9,19 +9,27 @@
                         <li class="nav-item active "><a href="#parkingInfoTab" role="tab" data-toggle="tab"
                                 class="nav-link active fa-sharp fa-solid fa-table-columns"> Parking Info</a>
                         </li>
-                        <li class="nav-item"><a href="#registerVehicleTab" role="tab" data-toggle="tab" class="nav-link fa-sharp fa-solid fa-car"> Register Vehicle</a>
+                        <li class="nav-item"><a href="#registerVehicleTab" role="tab" data-toggle="tab"
+                                class="nav-link fa-sharp fa-solid fa-car"> Register Vehicle</a>
+                        </li>
+                        <li class="nav-item"><a href="#checkOutUser" role="tab" data-toggle="tab"
+                                class="nav-link fa fa-bell-slash">
+                                Check-Out</a>
                         </li>
                     </ul>
                     <!-- Tabs Navigations -->
-                    
+
                     <!-- Tabs content -->
-                    
+
                     <div class="tab-content">
                         <div class="tab-pane container active" id="parkingInfoTab">
                             <%- include('partials/_dashboardPartial.ejs') %>
                         </div>
                         <div class="tab-pane container fade" id="registerVehicleTab">
                             <%- include('partials/_registerPartial.ejs') %>
+                        </div>
+                        <div class="tab-pane container fade" id="checkOutUser">
+                            <%- include('partials/_checkOutUser.ejs') %>
                         </div>
                     </div>
                 </div>
