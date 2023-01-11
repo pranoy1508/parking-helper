@@ -301,6 +301,9 @@ async function createReservationParkingLog(reservationReq, userName,reserveId) {
             parkingLog.ownerName = reservationReq.empName && reservationReq.empName.trim() != "" ? reservationReq.empName : `Guest_${idx}`;
             parkingLog.ownerId = "N/A";
             parkingLog.linkedReservationId = reserveId;
+            parkingLog.checkInTime=null;
+            parkingLog.checkOutTime=null;
+            parkingLog.status="RESERVED";
             await ParkingLogs.create(parkingLog);
             parkingLogged = true;
         }

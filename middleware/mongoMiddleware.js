@@ -122,7 +122,15 @@ module.exports.GetVehicleCountByType = async (_vehicleType, _locationId, startDa
             {
                 $gte: new Date(startDate),
                 $lte: new Date(endDate)
-            }
+            },
+            $or:[
+                {
+                    status:"CHECKED-IN"
+                },
+                {
+                    status:"RESERVED"
+                }
+            ]
         };
         vehicleCount = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).countDocuments(query);
         dbConnection.close();
@@ -336,6 +344,7 @@ module.exports.RemoveParkingDetails = async (uniqueId, parkingLocation) => {
         console.log(exception);
     }
 }
+
 module.exports.GetReservationDetailsByStatus = async (status,queryDate) => {
     let reservationDetails = null;
     try {
@@ -364,7 +373,6 @@ module.exports.GetReservationDetailsByUniqueId = async (requestId) => {
     }
     return reservationDetails;
 }
-
 
 module.exports.GetAllUsersByType = async (_type) => {
     let userDetails = null;
@@ -420,4 +428,26 @@ module.exports.GetImportHistoryById = async (historyId) => {
         console.log(exception);
     }
     return importHistoryResults;
+}
+
+module.exports.UpdateRelatedParkingLogs=async(uniqueId,status)=>{
+    let updateResult = null;
+    try {
+        const dbConnection = await mongoClient.connect(process.env.DATABASE_URL);
+        var dbo = dbConnection.db(process.env.DB_NAME);
+        updateResult = await dbo.collection(process.env.PARKING_LOGS_COLLECTIONS_NAME).updateOne(
+            { "linkedReservationId": uniqueId },
+            {
+                $set: {
+                    "status": status,
+                    "checkInTime": new Date()
+                }
+            }
+        );
+        dbConnection.close();
+    }
+    catch (exception) {
+        console.log(exception);
+    }
+    return updateResult;
 }

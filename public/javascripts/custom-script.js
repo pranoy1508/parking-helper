@@ -269,7 +269,7 @@ function saveParkingLog(vehicleStr) {
     parkingLog.rfid = $('#sec_rfidNo').val();
     parkingLog.parkingLocation = $('#parking_location_ddl_sec').val();
     contextVehicleDetails.forEach(vehicle => {
-        if (vehicle.ownerEmployeeId == parkingLog.empId) {
+        if (vehicle.ownerEmployeeId == parkingLog.empId && vehicle.vehicleNumber.indexOf(parkingLog.vehicleNumber)>-1) {
             parkingLog.vehicleNumber = vehicle.vehicleNumber;
         }
     });

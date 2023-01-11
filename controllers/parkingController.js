@@ -88,6 +88,9 @@ const addParkingLogs = asyncHandler(async (req, res) => {
         parkingLog.ownerName = parkingDetails.empName;
         parkingLog.ownerId = parkingDetails.empId;
         parkingLog.linkedReservationId=null;
+        parkingLog.checkInTime=new Date();
+        parkingLog.checkOutTime=null;
+        parkingLog.status="CHECKED-IN";
         if (!parkingLog.vehicleNumber || parkingLog.vehicleNumber == "" || parkingLog.vehicleNumber == " ") {
             return res.json({
                 statusCode: 4021,
@@ -154,6 +157,7 @@ const checkInGuest = asyncHandler(async (req, res) => {
     let reservationDetails = await mongoMiddleware.GetReservationDetailsById(reservationId);
     if (reservationDetails) {
         await mongoMiddleware.UpdateParkingRequest(req.session.users_id.userName, reservationId, "CHECKED-IN");
+        await mongoMiddleware.UpdateRelatedParkingLogs(reservationDetails.uniqueId,"CHECKED-IN");
         const officeDetails = await mongoMiddleware.GetFullOfficeLocations();
         const linkedOffice = _.find(officeDetails, (office) => {
             if (office.ParkingLocations) {

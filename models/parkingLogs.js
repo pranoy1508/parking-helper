@@ -10,7 +10,10 @@ const ParkingLogsSchema = new mongoose.Schema({
     createdBy: { type: String, required: true },
     ownerName: { type: String, required: false },
     ownerId: { type: String, required: true },
-    linkedReservationId: { type: String, required: false }
+    linkedReservationId: { type: String, required: false },
+    checkInTime: {type:Date,required:false},
+    checkOutTime: { type: Date, required: false },
+    status: { type: String, required: true }
 });
 
 const ParkingLogs = mongoose.model("ParkingLogs", ParkingLogsSchema, "ParkingLogs");
