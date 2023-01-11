@@ -11,13 +11,11 @@ const onLoad = asyncHandler(async (req, res) => {
     officeDetails = req.session.users_id.locationId ? _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId }) : officeDetails;
     const vehicleDetails = await mongoMiddleware.GetAllVehicleInformation();
     let reservationResponse = await mongoMiddleware.GetReservationDetailsByStatus("BOOKED", sysDate);
-    const startDate = `${sysDate}T00:00:00`;
-    const endDate = `${sysDate}T23:59:59`;
     for (let office of officeDetails) {
         if (office.ParkingLocations) {
             for (let parking of office.ParkingLocations) {
-                const twoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, startDate, endDate);
-                const fourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, startDate, endDate);
+                const twoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
+                const fourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
                 const locationIdDetails = await mongoMiddleware.GetParkingDetails(parking.LocationId);
                 parking.TotalTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking;
                 parking.TotalFourWheelerCount = locationIdDetails.NoOfFourWheelerParking;
@@ -71,10 +69,8 @@ const addParkingLogs = asyncHandler(async (req, res) => {
             message: `Invalid Details entered for ${parkingDetails.vehicleNumber}`,
         });
     }
-    const startDate = `${sysDate}T00:00:00`;
-    const endDate = `${sysDate}T23:59:59`;
     const locationDetails = await mongoMiddleware.GetParkingDetails(parkingDetails.parkingLocation);
-    const bookedCount = await mongoMiddleware.GetVehicleCountByType(parseInt(parkingDetails.vehicleType), parkingDetails.parkingLocation, startDate, endDate);
+    const bookedCount = await mongoMiddleware.GetVehicleCountByType(parseInt(parkingDetails.vehicleType), parkingDetails.parkingLocation, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
     const totalCount = parseInt(parkingDetails.vehicleType) == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
     const availableCount = totalCount - bookedCount;
     if (availableCount > 0) {
@@ -130,14 +126,11 @@ const getAvailabilityView = asyncHandler(async (req, res) => {
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
     if (!officeDetails || !req.session.users_id){return `No Details Found. Please Re-Login`};
     officeDetails = _.filter(officeDetails, ($off) => { return $off.OfficeId == req.session.users_id.locationId });
-    const sysDate = new Date().toISOString().split('T')[0];
-    const startDate = `${sysDate}T00:00:00`;
-    const endDate = `${sysDate}T23:59:59`;
     for (let office of officeDetails) {
         if (office.ParkingLocations) {
             for (let parking of office.ParkingLocations) {
-                const twoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, startDate, endDate);
-                const fourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, startDate, endDate);
+                const twoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
+                const fourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
                 const locationIdDetails = await mongoMiddleware.GetParkingDetails(parking.LocationId);
                 parking.AvailableTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking - twoWheelerCount;
                 parking.AvailableFourWheelerCount = locationIdDetails.NoOfFourWheelerParking - fourWheelerCount;

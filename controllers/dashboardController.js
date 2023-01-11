@@ -11,9 +11,6 @@ const onLoad = asyncHandler(async (req, res) => {
     let returnResponse = {};
     let vehicleInfo = await mongoMiddleware.GetVehicleInformationByName(req.session.users_id.userName);
     let officeDetails = await mongoMiddleware.GetFullOfficeLocations();
-    const sysDate = new Date().toISOString().split('T')[0];
-    const startDate = `${sysDate}T00:00:00`;
-    const endDate = `${sysDate}T23:59:59`;
     if (vehicleInfo.length == 0) {
         vehicleInfo = [];
         vehicleInfo.push(new VehicleDetails(req.session.users_id.userName, null, 0, null));
@@ -48,8 +45,8 @@ const onLoad = asyncHandler(async (req, res) => {
                 const locationIdDetails = await mongoMiddleware.GetParkingDetails(parking.LocationId);
                 parking.TotalTwoWheelerCount = locationIdDetails.NoOfTwoWheelerParking;
                 parking.TotalFourWheelerCount = locationIdDetails.NoOfFourWheelerParking;
-                parking.BookedTwoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, startDate, endDate);;
-                parking.BookedFourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, startDate, endDate);;
+                parking.BookedTwoWheelerCount = await mongoMiddleware.GetVehicleCountByType(0, parking.LocationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));;
+                parking.BookedFourWheelerCount = await mongoMiddleware.GetVehicleCountByType(1, parking.LocationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));;
             }
         }
     }

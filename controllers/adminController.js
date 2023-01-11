@@ -316,11 +316,8 @@ async function getReservationEmailBody(template, reservationRequest, payload) {
 }
 
 async function isReservationAllowed(reservationReq) {
-    const sysDate = new Date().toISOString().split('T')[0];
-    const startDate = `${sysDate}T00:00:00`;
-    const endDate = `${sysDate}T23:59:59`;
     const locationDetails = await mongoMiddleware.GetParkingDetails(reservationReq.locationId);
-    const bookedCount = await mongoMiddleware.GetVehicleCountByType(reservationReq.vehicleType, reservationReq.locationId, startDate, endDate);
+    const bookedCount = await mongoMiddleware.GetVehicleCountByType(reservationReq.vehicleType, reservationReq.locationId, new Date().setHours(0, 0, 0, 0), new Date().setHours(23, 59, 59, 0));
     const totalCount = reservationReq.vehicleType == 0 ? locationDetails.NoOfTwoWheelerParking : locationDetails.NoOfFourWheelerParking;
     return (totalCount - bookedCount >0);
 }
