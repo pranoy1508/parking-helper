@@ -167,7 +167,6 @@ const exportUserLogs = asyncHandler(async (req, res) => {
 
     worksheet.columns = [
         { header: "UserName", key: "userName", width: 20 },
-        { header: "Password", key: "userPassword", width: 20 },
         { header: "Role", key: "userRole", width: 20 },
         { header: "Location", key: "officeLocation", width: 20 },
         { header: "Action", key: "action", width: 20 },
